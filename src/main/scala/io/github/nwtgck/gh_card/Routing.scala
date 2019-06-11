@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport._
 
-import scala.util.parsing.json.JSON
+import scala.util.Success
 import scala.xml.Elem
 
 class Routing {
@@ -114,21 +114,14 @@ class Routing {
         repoNameWithExt match {
           case reg(repoName) =>
             println(s"repoName: ${repoName}")
-            // TODO: Usage GitHub is not in type-safe way
-            val json: String = scala.io.Source.fromURL(s"https://api.github.com/repos/${repoName}").mkString
-            JSON.parseFull(json) match {
-              case Some(any) =>
-                val map: Map[String, Any] = any.asInstanceOf[Map[String, Any]]
-                val language = map("language").asInstanceOf[String]
-                val description = map("description").asInstanceOf[String]
-                // TODO: Support kilo (unit) representation
-                val nStars = map("stargazers_count").asInstanceOf[Double].toInt
-                val nForks = map("forks_count").asInstanceOf[Double].toInt
-                val svg = generateSvg(repoName, language, description, nStars, nForks)
+            GitHubApi.getRepository(repoName) match {
+              case Success(repo) =>
+              // TODO: Support kilo (unit) representation in star count
+              val svg = generateSvg(repoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
                 complete(svg)
-              case None =>
+              case _ =>
                 // TODO: Fail response
-                complete("Internal JSON parse error")
+                complete("Internal error in request")
             }
           case _ =>
             // TODO: Fail response

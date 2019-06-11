@@ -17,6 +17,8 @@ lazy val root = (project in file(".")).
       // (from: https://github.com/scala/scala-module-dependency-sample)
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
 
+      "io.spray" %%  "spray-json" % "1.3.5",
+
       // Slick
       "com.typesafe.slick" %% "slick" % "3.1.1",
       "org.slf4j" % "slf4j-nop" % "1.7.26",

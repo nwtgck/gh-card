@@ -11,7 +11,11 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= Seq(
       // sbt from http://akka.io/docs/
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
+
+      // (from: https://github.com/scala/scala-module-dependency-sample)
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
 
       // Slick
       "com.typesafe.slick" %% "slick" % "3.1.1",

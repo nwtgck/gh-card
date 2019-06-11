@@ -104,24 +104,35 @@ class Routing {
   val route: Route =
     get {
       pathSingleSlash {
-        // TODO: Hard code
-        val repoName: String = "nwtgck/nipp"
-
-        // TODO: Usage GitHub is not in type-safe way
-        val json: String = scala.io.Source.fromURL(s"https://api.github.com/repos/${repoName}").mkString
-        JSON.parseFull(json) match {
-          case Some(any) =>
-            val map: Map[String, Any] = any.asInstanceOf[Map[String, Any]]
-            val language = map("language").asInstanceOf[String]
-            val description = map("description").asInstanceOf[String]
-            // TODO: Support kilo (unit) representation
-            val nStars = map("stargazers_count").asInstanceOf[Double].toInt
-            val nForks = map("forks_count").asInstanceOf[Double].toInt
-            val svg = generateSvg(repoName, language, description, nStars, nForks)
-            complete(svg)
-          case None =>
+        complete("e.g. /repos/rust-lang/rust.svg")
+      } ~
+      path("repos" / Remaining) { repoNameWithExt =>
+        println(s"repoNameWithExt: ${repoNameWithExt}")
+        // NOTE: In the future, png may be also supported
+        val reg =
+          """(.+)\.svg""".r
+        repoNameWithExt match {
+          case reg(repoName) =>
+            println(s"repoName: ${repoName}")
+            // TODO: Usage GitHub is not in type-safe way
+            val json: String = scala.io.Source.fromURL(s"https://api.github.com/repos/${repoName}").mkString
+            JSON.parseFull(json) match {
+              case Some(any) =>
+                val map: Map[String, Any] = any.asInstanceOf[Map[String, Any]]
+                val language = map("language").asInstanceOf[String]
+                val description = map("description").asInstanceOf[String]
+                // TODO: Support kilo (unit) representation
+                val nStars = map("stargazers_count").asInstanceOf[Double].toInt
+                val nForks = map("forks_count").asInstanceOf[Double].toInt
+                val svg = generateSvg(repoName, language, description, nStars, nForks)
+                complete(svg)
+              case None =>
+                // TODO: Fail response
+                complete("Internal JSON parse error")
+            }
+          case _ =>
             // TODO: Fail response
-            complete("")
+            complete("Invalid request")
         }
       }
     }

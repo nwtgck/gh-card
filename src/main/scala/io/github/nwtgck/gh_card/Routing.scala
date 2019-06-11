@@ -28,14 +28,9 @@ class Routing {
     lines
   }
 
-  def getLanguageColor(language: String): String = {
-    // TODO: Hard code
-    "#c22d40"
-  }
-
   def generateSvg(repoName: String, language: String, description: String, nStars: Int, nForks: Int): Elem = {
     // Get language color
-    val languageColor: String = getLanguageColor(language)
+    val languageColor: String = GitHubLanguageColors.colors(language)
     // Convert description to lines
     val descriptionLines: List[String] = descriptionToLines(description)
 

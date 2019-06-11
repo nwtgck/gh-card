@@ -3,6 +3,9 @@ package io.github.nwtgck.gh_card
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport._
+import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 
 import scala.util.Success
 import scala.xml.Elem
@@ -116,9 +119,16 @@ class Routing {
             println(s"repoName: ${repoName}")
             GitHubApi.getRepository(repoName) match {
               case Success(repo) =>
-              // TODO: Support kilo (unit) representation in star count
-              val svg = generateSvg(repoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
-                complete(svg)
+                // TODO: Support kilo (unit) representation in star count
+                val svg = generateSvg(repoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
+                complete(HttpResponse(
+                  StatusCodes.OK,
+                  List.empty,
+                  HttpEntity(
+                    ContentType(MediaTypes.`image/svg+xml`),
+                    ByteString.fromString(svg.toString)
+                  )
+                ))
               case _ =>
                 // TODO: Fail response
                 complete("Internal error in request")

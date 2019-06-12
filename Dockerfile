@@ -9,20 +9,16 @@ WORKDIR /app
 # Generate jar
 RUN sbt assembly
 
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/target/jar/gh-card.jar"]
 
+## Open JDK 8
+FROM openjdk:8
+LABEL maintainer="Ryo Ota <nwtgck@gmail.com>"
 
+# Make directories
+RUN mkdir -p /app/backend
 
-## Open JDK 8 - Alpine
-#FROM openjdk:8-alpine
-#LABEL maintainer="Ryo Ota <nwtgck@gmail.com>"
-#
-## Make directories
-#RUN mkdir -p /app/backend
-#
-## Copy artifact
-#COPY --from=build /app/target/jar/gh-card.jar /app/backend/gh-card.jar
-#
-## Run entry (Run the server)
-#ENTRYPOINT ["java", "-jar", "/app/backend/gh-card.jar"]
+# Copy artifact
+COPY --from=build /app/target/jar/gh-card.jar /app/backend/gh-card.jar
+
+# Run entry (Run the server)
+ENTRYPOINT ["java", "-jar", "/app/backend/gh-card.jar"]

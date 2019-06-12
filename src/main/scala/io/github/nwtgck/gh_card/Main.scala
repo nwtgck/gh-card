@@ -26,7 +26,6 @@ object Main {
         implicit val materializer: ActorMaterializer = ActorMaterializer()
 
         // Create Redis client
-        // TODO: Hard code host
         val jedis: Jedis = new Jedis(option.redisHost)
 
         // Create GitHub API Service

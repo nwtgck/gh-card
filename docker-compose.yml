@@ -3,6 +3,7 @@ services:
   backend:
     build: .
     restart: always
+    command:  --redis-host=cache
     depends_on:
       - cache
     ports:

@@ -1,10 +1,10 @@
 package io.github.nwtgck.gh_card
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport._
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
-import akka.stream.scaladsl.Source
 import akka.util.ByteString
 
 import scala.util.Success
@@ -102,6 +102,28 @@ class Routing {
     </svg>
   }
 
+  def convertSvgToPng(svg: Elem): ByteString = {
+    import org.apache.batik.transcoder.{SVGAbstractTranscoder, TranscoderInput, TranscoderOutput}
+    import org.apache.batik.transcoder.image.PNGTranscoder
+
+    val istream = new ByteArrayInputStream(svg.toString.getBytes("utf-8"))
+    val byteOut = new ByteArrayOutputStream()
+    val ostream = byteOut
+
+    val input = new TranscoderInput(istream)
+    val output = new TranscoderOutput(ostream)
+    val pngTranscoder = new PNGTranscoder()
+    // TODO: Hard code width and height
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, 450f * 3)
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, 160f * 3)
+
+    // Convert
+    pngTranscoder.transcode(input, output)
+
+    // Get .png byte string
+    ByteString.fromArray(byteOut.toByteArray)
+  }
+
   val route: Route =
     get {
       pathSingleSlash {
@@ -109,24 +131,35 @@ class Routing {
       } ~
       path("repos" / Remaining) { repoNameWithExt =>
         println(s"repoNameWithExt: ${repoNameWithExt}")
-        // NOTE: In the future, png may be also supported
-        val reg =
-          """(.+)/(.+)\.svg""".r
+        val reg = """(.+)/(.+)\.(svg|png)""".r
         repoNameWithExt match {
-          case reg(ownerName, shortRepoName) =>
+          case reg(ownerName, shortRepoName, extension) =>
             println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
             GitHubApi.getRepository(s"${ownerName}/${shortRepoName}") match {
               case Success(repo) =>
                 // TODO: Support kilo (unit) representation in star count
                 val svg = generateSvg(shortRepoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
-                complete(HttpResponse(
-                  StatusCodes.OK,
-                  List.empty,
-                  HttpEntity(
-                    ContentType(MediaTypes.`image/svg+xml`),
-                    ByteString.fromString(svg.toString)
-                  )
-                ))
+
+                extension match {
+                  case "svg" =>
+                    complete(HttpResponse(
+                      StatusCodes.OK,
+                      List.empty,
+                      HttpEntity(
+                        ContentType(MediaTypes.`image/svg+xml`),
+                        ByteString.fromString(svg.toString)
+                      )
+                    ))
+                  case "png" =>
+                    complete(HttpResponse(
+                      StatusCodes.OK,
+                      List.empty,
+                      HttpEntity(
+                        ContentType(MediaTypes.`image/png`),
+                        convertSvgToPng(svg)
+                      )
+                    ))
+                }
               case _ =>
                 // TODO: Fail response
                 complete("Internal error in request")

@@ -20,6 +20,10 @@ lazy val root = (project in file(".")).
 
       "io.spray" %%  "spray-json" % "1.3.5",
 
+      // for SVG to PNG conversion
+      // https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all
+      "org.apache.xmlgraphics" % "batik-all" % "1.9.1",
+
       // ScalaTest
       "org.scalatest" %% "scalatest" % "3.0.7" % Test
     )

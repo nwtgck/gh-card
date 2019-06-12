@@ -34,6 +34,8 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
 
+      // Option parser
+      "com.github.scopt" %% "scopt" % "3.7.1",
       // (from: https://github.com/scala/scala-module-dependency-sample)
       "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
       // JSON parse

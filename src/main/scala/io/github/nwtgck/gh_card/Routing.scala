@@ -6,11 +6,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 import akka.util.ByteString
+import io.github.nwtgck.gh_card.domain.GitHubApiService
 
 import scala.util.Success
 import scala.xml.Elem
 
-class Routing {
+class Routing(gitHubApiService: GitHubApiService) {
   // TODO: Make it declarative
   // TODO: Support non-English description
   private def descriptionToLines(description: String): List[String] = {
@@ -135,7 +136,7 @@ class Routing {
         repoNameWithExt match {
           case reg(ownerName, shortRepoName, extension) =>
             println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
-            GitHubApi.getRepository(s"${ownerName}/${shortRepoName}") match {
+            gitHubApiService.getRepository(s"${ownerName}/${shortRepoName}") match {
               case Success(repo) =>
                 // TODO: Support kilo (unit) representation in star count
                 val svg = generateSvg(shortRepoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)

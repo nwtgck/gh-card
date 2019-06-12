@@ -17,8 +17,10 @@ lazy val root = (project in file(".")).
 
       // (from: https://github.com/scala/scala-module-dependency-sample)
       "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
-
+      // JSON parse
       "io.spray" %%  "spray-json" % "1.3.5",
+      // Redis
+      "redis.clients" % "jedis" % "3.0.1",
 
       // for SVG to PNG conversion
       // https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all

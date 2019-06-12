@@ -8,6 +8,25 @@ val akkaHttpVersion = "10.1.8"
 
 lazy val root = (project in file(".")).
   settings(
+    // Skip test when sbt assembly
+    // (from: http://www.shigemk2.com/entry/scala_aseembly_part2)
+    test in assembly := {},
+    // (from: https://qiita.com/ytanak/items/97ecc67786ed7c5557bb)
+    assemblyMergeStrategy in assembly := {
+      case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first
+      case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps @ _*) if ps.last endsWith ".xml" => MergeStrategy.first
+      case PathList(ps @ _*) if ps.last endsWith ".types" => MergeStrategy.first
+      case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
+      case "application.conf"                            => MergeStrategy.concat
+      case "unwanted.txt"                                => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
+    // (from: https://stackoverflow.com/a/39389112/2885946)
+    assemblyOutputPath in assembly := file(s"target/jar/${name.value}.jar"),
+
     libraryDependencies ++= Seq(
       // sbt from http://akka.io/docs/
       "com.typesafe.akka" %% "akka-stream" % "2.5.23",

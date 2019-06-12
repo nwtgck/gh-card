@@ -1,0 +1,15 @@
+version: '3.1'
+services:
+  backend:
+    build: .
+    restart: always
+    depends_on:
+      - cache
+    ports:
+      - "8080:8080"
+
+  cache:
+    image: redis
+    restart: always
+    expose:
+      - "6379"

@@ -11,7 +11,8 @@ object Main {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     // Create Redis client
-    val jedis: Jedis = new Jedis()
+    // TODO: Hard code host
+    val jedis: Jedis = new Jedis("cache")
 
 
     // Create GitHub API Service
@@ -26,9 +27,10 @@ object Main {
     )
 
     // TODO: Hard code
-    val host = "localhost"
+    val host = "0.0.0.0"
     // TODO: Hard code
     val port = 8080
     Http().bindAndHandle(new Routing(gitHubApiService).route, host, port)
+    println(s"Listening on ${port}...")
   }
 }

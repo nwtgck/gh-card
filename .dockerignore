@@ -1,0 +1,11 @@
+/.git
+/.gitignore
+
+/.idea
+/project/target
+/project/project
+/target
+
+/Dockerfile
+/.dockerignore
+/docker-compose.yml

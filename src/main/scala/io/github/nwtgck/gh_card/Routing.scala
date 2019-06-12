@@ -31,7 +31,7 @@ class Routing {
     lines
   }
 
-  def generateSvg(repoName: String, language: String, description: String, nStars: Int, nForks: Int): Elem = {
+  def generateSvg(shortRepoName: String, language: String, description: String, nStars: Int, nForks: Int): Elem = {
     // Get language color
     val languageColor: String = GitHubLanguageColors.colors(language)
     // Convert description to lines
@@ -73,7 +73,7 @@ class Routing {
         </g>
         <g fill="#0366d6" fill-opacity="1" stroke="#0366d6" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- Repo name -->
-          <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{repoName}</text>
+          <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{shortRepoName}</text>
         </g>
         <!-- Description -->
         {descriptionElems}
@@ -111,14 +111,14 @@ class Routing {
         println(s"repoNameWithExt: ${repoNameWithExt}")
         // NOTE: In the future, png may be also supported
         val reg =
-          """(.+)\.svg""".r
+          """(.+)/(.+)\.svg""".r
         repoNameWithExt match {
-          case reg(repoName) =>
-            println(s"repoName: ${repoName}")
-            GitHubApi.getRepository(repoName) match {
+          case reg(ownerName, shortRepoName) =>
+            println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
+            GitHubApi.getRepository(s"${ownerName}/${shortRepoName}") match {
               case Success(repo) =>
                 // TODO: Support kilo (unit) representation in star count
-                val svg = generateSvg(repoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
+                val svg = generateSvg(shortRepoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
                 complete(HttpResponse(
                   StatusCodes.OK,
                   List.empty,

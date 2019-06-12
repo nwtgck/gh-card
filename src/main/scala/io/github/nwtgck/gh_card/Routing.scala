@@ -6,12 +6,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 import akka.util.ByteString
-import io.github.nwtgck.gh_card.domain.GitHubApiService
 
 import scala.util.Success
 import scala.xml.Elem
 
-class Routing(gitHubApiService: GitHubApiService) {
+class Routing(gitHubApiService: domain.GitHubApiService,
+              gitHubRepositoryPngCardCacheRepository: domain.GitHubRepositoryPngCardCacheRepository) {
   // TODO: Make it declarative
   // TODO: Support non-English description
   private def descriptionToLines(description: String): List[String] = {
@@ -103,7 +103,7 @@ class Routing(gitHubApiService: GitHubApiService) {
     </svg>
   }
 
-  def convertSvgToPng(svg: Elem): ByteString = {
+  def convertSvgToPng(svg: Elem, width: Int, height: Int): ByteString = {
     import org.apache.batik.transcoder.{SVGAbstractTranscoder, TranscoderInput, TranscoderOutput}
     import org.apache.batik.transcoder.image.PNGTranscoder
 
@@ -114,9 +114,8 @@ class Routing(gitHubApiService: GitHubApiService) {
     val input = new TranscoderInput(istream)
     val output = new TranscoderOutput(ostream)
     val pngTranscoder = new PNGTranscoder()
-    // TODO: Hard code width and height
-    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, 450f * 3)
-    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, 160f * 3)
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, width.toFloat)
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, height.toFloat)
 
     // Convert
     pngTranscoder.transcode(input, output)
@@ -152,12 +151,26 @@ class Routing(gitHubApiService: GitHubApiService) {
                       )
                     ))
                   case "png" =>
+                    // TODO: Hard code width and height
+                    val width  = 450 * 3
+                    val height = 160 * 3
+                    // Usage cache or
+                    val pngByteString: ByteString = gitHubRepositoryPngCardCacheRepository
+                      .get(s"${ownerName}/${shortRepoName}", width, height)
+                      .getOrElse({
+                        // Convert SVG to png
+                        val png = convertSvgToPng(svg, width, height)
+                        // Cache PNG
+                        gitHubRepositoryPngCardCacheRepository.cache(s"${ownerName}/${shortRepoName}", width, height, png)
+                        png
+                      })
+
                     complete(HttpResponse(
                       StatusCodes.OK,
                       List.empty,
                       HttpEntity(
                         ContentType(MediaTypes.`image/png`),
-                        convertSvgToPng(svg)
+                        pngByteString
                       )
                     ))
                 }

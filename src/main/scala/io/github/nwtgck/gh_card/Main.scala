@@ -39,11 +39,23 @@ object Main {
           )
         )
 
+        // PNG cache
+        val gitHubRepositoryPngCardCacheRepository = new infra.RedisGitHubRepositoryPngCardCacheRepository(
+          jedis,
+          // TTL for repo JSON
+          // 20 min
+          // TODO: Hard code
+          20 * 60
+        )
+
+        // Get route
+        val route = new Routing(gitHubApiService, gitHubRepositoryPngCardCacheRepository).route
+
         // TODO: Hard code
         val host = "0.0.0.0"
         // TODO: Hard code
         val port = 8080
-        Http().bindAndHandle(new Routing(gitHubApiService).route, host, port)
+        Http().bindAndHandle(route, host, port)
         println(s"Listening on ${port}...")
       case None =>
         // Command line parser error

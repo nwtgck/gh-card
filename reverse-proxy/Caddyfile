@@ -3,7 +3,7 @@
     header_upstream path {path}
   }
   proxy / frontend:8000
-  log / access.log "{combined}"
+  log / /var/log/access.log "{combined}"
 }
 
 0.0.0.0:443 {
@@ -11,6 +11,6 @@
     header_upstream path {path}
   }
   proxy / frontend:8000
-  log / access.log "{combined}"
+  log / /var/log/access.log "{combined}"
   tls /etc/letsencrypt/live/gh-card.dev/cert.pem /etc/letsencrypt/live/gh-card.dev/privkey.pem
 }

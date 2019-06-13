@@ -6,6 +6,7 @@ services:
       - ./reverse-proxy/Caddyfile:/Caddyfile:ro
       - /etc/letsencrypt/live/gh-card.dev/cert.pem:/etc/letsencrypt/live/gh-card.dev/cert.pem:ro
       - /etc/letsencrypt/live/gh-card.dev/privkey.pem:/etc/letsencrypt/live/gh-card.dev/privkey.pem:ro
+      - ./log/:/var/log/
     ports:
       - "80:80"
       - "443:443"

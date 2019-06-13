@@ -1,0 +1,7 @@
+0.0.0.0:80 {
+  proxy /repos backend:8080 {
+    header_upstream path {path}
+  }
+  proxy / frontend:8000
+  log / access.log "{combined}"
+}

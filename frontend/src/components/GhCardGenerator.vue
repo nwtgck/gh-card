@@ -8,7 +8,7 @@
     </span>
     <hr>
     <p>
-      <input type="text" v-model="repoName" placeholder="user/repo" class="repo_name"><br>
+      <input type="text" v-model="repoName" placeholder="user/repo" class="repo_name">
       <button @click="update()">Generate</button><br>
     </p>
     <div v-if="imageGenerated">
@@ -54,6 +54,18 @@ export default class GhCardGenerator extends Vue {
   private embedHtml     = '';
   private embedMarkdown = '';
   private embedScrapbox = '';
+
+  private mounted() {
+    window.addEventListener('keydown', (e: WindowEventMap['keydown']) => {
+      // Meta + Enter
+      // (Ctrl + Enter or Cmd + Enter)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        Vue.nextTick(() => {
+          this.update();
+        });
+      }
+    });
+  }
 
   private update() {
     this.gitHubRepoUrl = this.getGitHubRepoUrl(this.repoName);

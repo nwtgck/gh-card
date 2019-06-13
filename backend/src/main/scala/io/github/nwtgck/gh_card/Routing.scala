@@ -199,8 +199,8 @@ class Routing(gitHubApiService: domain.GitHubApiService,
                   // Repo name in an card
                   val repoNameInImage: String = if (useFullName) s"${ownerName}/${shortRepoName}" else shortRepoName
 
-                  // TODO: Support kilo (unit) representation in star count
-                  val svg = generateSvg(repoNameInImage, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
+                  // Generate SVG image
+                  val svg = generateSvg(repoNameInImage, repo.language, repo.description.getOrElse(""), repo.stargazers_count, repo.forks_count)
 
                   extension match {
                     case "svg" =>

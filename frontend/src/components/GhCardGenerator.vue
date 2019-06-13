@@ -26,13 +26,14 @@
 </template>
 
 <script lang="ts">
+/* tslint:disable:no-console */
 import { Component, Watch, Vue } from 'vue-property-decorator';
+import consts from '@/constants';
+
+console.log(`image server is ${consts.imageServerUrl}`);
 
 @Component
 export default class GhCardGenerator extends Vue {
-  // TODO: Hard code
-  private imageServerUrl: string = 'http://localhost:8080';
-
   private exampleRepoNames = [
     'mozilla/send',
   ];
@@ -54,7 +55,7 @@ export default class GhCardGenerator extends Vue {
   }
 
   private getImgUrl(repoName: string, imageExtension: string): string {
-    return `${this.imageServerUrl}/repos/${repoName}.${imageExtension}`;
+    return `${consts.imageServerUrl}/repos/${repoName}.${imageExtension}`;
   }
 
   private getGitHubRepoUrl(repoName: string): string {

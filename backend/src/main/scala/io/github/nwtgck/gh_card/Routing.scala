@@ -130,57 +130,65 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         complete("e.g. /repos/rust-lang/rust.svg")
       } ~
       path("repos" / Remaining) { repoNameWithExt =>
-        println(s"repoNameWithExt: ${repoNameWithExt}")
-        val reg = """(.+)/(.+)\.(svg|png)""".r
-        repoNameWithExt match {
-          case reg(ownerName, shortRepoName, extension) =>
-            println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
-            gitHubApiService.getRepository(s"${ownerName}/${shortRepoName}") match {
-              case Success(repo) =>
-                // TODO: Support kilo (unit) representation in star count
-                val svg = generateSvg(shortRepoName, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
+        parameter("fullname".?) { fullname: Option[String] =>
+          // Whether include owner or not
+          val useFullName: Boolean = fullname.isDefined
 
-                extension match {
-                  case "svg" =>
-                    complete(HttpResponse(
-                      StatusCodes.OK,
-                      List.empty,
-                      HttpEntity(
-                        ContentType(MediaTypes.`image/svg+xml`),
-                        ByteString.fromString(svg.toString)
-                      )
-                    ))
-                  case "png" =>
-                    // TODO: Hard code width and height
-                    val width  = 450 * 3
-                    val height = 160 * 3
-                    // Usage cache or
-                    val pngByteString: ByteString = gitHubRepositoryPngCardCacheRepository
-                      .get(s"${ownerName}/${shortRepoName}", width, height)
-                      .getOrElse({
-                        // Convert SVG to png
-                        val png = convertSvgToPng(svg, width, height)
-                        // Cache PNG
-                        gitHubRepositoryPngCardCacheRepository.cache(s"${ownerName}/${shortRepoName}", width, height, png)
-                        png
-                      })
+          println(s"repoNameWithExt: ${repoNameWithExt}, useFullName: ${useFullName}")
+          val reg = """(.+)/(.+)\.(svg|png)""".r
+          repoNameWithExt match {
+            case reg(ownerName, shortRepoName, extension) =>
+              println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
+              gitHubApiService.getRepository(s"${ownerName}/${shortRepoName}") match {
+                case Success(repo) =>
+                  // Repo name in an card
+                  val repoNameInImage: String = if (useFullName) s"${ownerName}/${shortRepoName}" else shortRepoName
 
-                    complete(HttpResponse(
-                      StatusCodes.OK,
-                      List.empty,
-                      HttpEntity(
-                        ContentType(MediaTypes.`image/png`),
-                        pngByteString
-                      )
-                    ))
-                }
-              case _ =>
-                // TODO: Fail response
-                complete("Internal error in request")
-            }
-          case _ =>
-            // TODO: Fail response
-            complete("Invalid request")
+                  // TODO: Support kilo (unit) representation in star count
+                  val svg = generateSvg(repoNameInImage, repo.language, repo.description, repo.stargazers_count, repo.forks_count)
+
+                  extension match {
+                    case "svg" =>
+                      complete(HttpResponse(
+                        StatusCodes.OK,
+                        List.empty,
+                        HttpEntity(
+                          ContentType(MediaTypes.`image/svg+xml`),
+                          ByteString.fromString(svg.toString)
+                        )
+                      ))
+                    case "png" =>
+                      // TODO: Hard code width and height
+                      val width  = 450 * 3
+                      val height = 160 * 3
+                      // Usage cache or
+                      val pngByteString: ByteString = gitHubRepositoryPngCardCacheRepository
+                        .get(s"${ownerName}/${shortRepoName}", useFullName, width, height)
+                        .getOrElse({
+                          // Convert SVG to png
+                          val png = convertSvgToPng(svg, width, height)
+                          // Cache PNG
+                          gitHubRepositoryPngCardCacheRepository.cache(s"${ownerName}/${shortRepoName}", useFullName, width, height, png)
+                          png
+                        })
+
+                      complete(HttpResponse(
+                        StatusCodes.OK,
+                        List.empty,
+                        HttpEntity(
+                          ContentType(MediaTypes.`image/png`),
+                          pngByteString
+                        )
+                      ))
+                  }
+                case _ =>
+                  // TODO: Fail response
+                  complete("Internal error in request")
+              }
+            case _ =>
+              // TODO: Fail response
+              complete("Invalid request")
+          }
         }
       }
     }

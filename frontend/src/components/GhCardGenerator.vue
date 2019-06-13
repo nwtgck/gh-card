@@ -71,12 +71,17 @@ export default class GhCardGenerator extends Vue {
     });
   }
 
+  private get cleanRepoName(): string {
+    // Remove white spaces from repo name
+    return this.repoName.replace(/\s/g, '');
+  }
+
   private update() {
-    this.gitHubRepoUrl = this.getGitHubRepoUrl(this.repoName);
-    this.imageUrl      = this.getImgUrl(this.repoName, this.imageExtension, this.useFullName);
-    this.embedHtml     = this.getEmbedHtml(this.repoName, this.imageExtension, this.useFullName);
-    this.embedMarkdown = this.getEmbedMarkdown(this.repoName, this.imageExtension, this.useFullName);
-    this.embedScrapbox = this.getEmbedScrapbox(this.repoName, this.imageExtension, this.useFullName);
+    this.gitHubRepoUrl = this.getGitHubRepoUrl(this.cleanRepoName);
+    this.imageUrl      = this.getImgUrl(this.cleanRepoName, this.imageExtension, this.useFullName);
+    this.embedHtml     = this.getEmbedHtml(this.cleanRepoName, this.imageExtension, this.useFullName);
+    this.embedMarkdown = this.getEmbedMarkdown(this.cleanRepoName, this.imageExtension, this.useFullName);
+    this.embedScrapbox = this.getEmbedScrapbox(this.cleanRepoName, this.imageExtension, this.useFullName);
     // NOTE: This will be never false
     this.imageGenerated = true;
   }

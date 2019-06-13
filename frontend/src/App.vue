@@ -1,17 +1,17 @@
 <template>
   <div id="app">
     <h1>GitHub Repository Card<br>for every web site</h1>
-    <HelloWorld />
+    <GhCardGenerator />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+import GhCardGenerator from './components/GhCardGenerator.vue';
 
 @Component({
   components: {
-    HelloWorld,
+    GhCardGenerator,
   },
 })
 export default class App extends Vue {}

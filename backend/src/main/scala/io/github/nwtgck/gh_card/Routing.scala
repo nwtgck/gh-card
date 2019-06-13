@@ -32,6 +32,20 @@ class Routing(gitHubApiService: domain.GitHubApiService,
     lines
   }
 
+  // GitHub number string for stars and forks
+  private def gitHubNumberString(number: Int): String = {
+    if (number < 950) {
+      number.toString
+    } else {
+      val k = number.toFloat / 1000
+      if (k < 99.9) {
+        "%.1fk" format k
+      } else {
+        s"${Math.round(k)}k"
+      }
+    }
+  }
+
   def generateSvg(shortRepoName: String, language: String, description: String, nStars: Int, nForks: Int): Elem = {
     // Get language color
     val languageColor: String = GitHubLanguageColors.colors(language)
@@ -87,7 +101,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         </g>
         <g fill="#586069" fill-opacity="1" stroke="#586069" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- The number of stars -->
-          <text fill="#586069" fill-opacity="1" stroke="none" xml:space="preserve" x="126" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{nStars}</text>
+          <text fill="#586069" fill-opacity="1" stroke="none" xml:space="preserve" x="126" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{gitHubNumberString(nStars)}</text>
         </g>
         <!-- Fork icon -->
         <g fill="#000000" fill-opacity="1" stroke="none" transform={s"matrix(1,0,0,1,168,${lastDescriptionY + 13})"}>
@@ -95,7 +109,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         </g>
         <g fill="#586069" fill-opacity="1" stroke="#586069" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- The number of forks -->
-          <text fill="" fill-opacity="1" stroke="none" xml:space="preserve" x="185" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{nForks}</text>
+          <text fill="" fill-opacity="1" stroke="none" xml:space="preserve" x="185" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{gitHubNumberString(nForks)}</text>
         </g>
         <!-- Language color -->
         <circle cx="23" cy={s"${lastDescriptionY + 21}"} r="7" stroke="none" fill={s"${languageColor}"}/>

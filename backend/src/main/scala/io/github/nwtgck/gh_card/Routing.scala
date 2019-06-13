@@ -46,9 +46,9 @@ class Routing(gitHubApiService: domain.GitHubApiService,
     }
   }
 
-  def generateSvg(shortRepoName: String, language: String, description: String, nStars: Int, nForks: Int): Elem = {
+  def generateSvg(shortRepoName: String, languageOpt: Option[String], description: String, nStars: Int, nForks: Int): Elem = {
     // Get language color
-    val languageColor: String = GitHubLanguageColors.colors(language)
+    val languageColorOpt: Option[String] = languageOpt.map(GitHubLanguageColors.colors)
     // Convert description to lines
     val descriptionLines: List[String] = descriptionToLines(description)
 
@@ -69,7 +69,12 @@ class Routing(gitHubApiService: domain.GitHubApiService,
     // Define board's height
     val height: Int = lastDescriptionY + 43
     // X coordinate next to language
-    val languageNextX: Int = 60 + (5 * language.length)
+    val languageNextX: Int = languageOpt match {
+      case Some(language) =>
+        60 + (5 * language.length)
+      case _ =>
+        16
+    }
 
     // TODO: Remove stars and forks when 0
     // TODO: Remove extra spaces between language and star or fork
@@ -94,9 +99,16 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         </g>
         <!-- Description -->
         {descriptionElems}
-        <g fill="#24292e" fill-opacity="1" stroke="#24292e" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
-          <text fill="#24292e" fill-opacity="1" stroke="none" xml:space="preserve" x="33" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{language}</text>
-        </g>
+        {
+          languageOpt match {
+            case Some(language) =>
+              <!-- Language  -->
+              <g fill="#24292e" fill-opacity="1" stroke="#24292e" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
+                <text fill="#24292e" fill-opacity="1" stroke="none" xml:space="preserve" x="33" y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{language}</text>
+              </g>
+            case _ => ()
+          }
+        }
         <!-- Star icon -->
         <g fill="#000000" fill-opacity="1" stroke="none" transform={s"matrix(1,0,0,1,${languageNextX},${lastDescriptionY + 13})"}>
           <path vector-effect="none" fill-rule="evenodd" d="M14,6 L9.1,5.36 L7,1 L4.9,5.36 L0,6 L3.6,9.26 L2.67,14 L7,11.67 L11.33,14 L10.4,9.26 L14,6" />
@@ -113,8 +125,14 @@ class Routing(gitHubApiService: domain.GitHubApiService,
           <!-- The number of forks -->
           <text fill="" fill-opacity="1" stroke="none" xml:space="preserve" x={s"${languageNextX + 80}"} y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{gitHubNumberString(nForks)}</text>
         </g>
-        <!-- Language color -->
-        <circle cx="23" cy={s"${lastDescriptionY + 21}"} r="7" stroke="none" fill={s"${languageColor}"}/>
+        {
+          languageColorOpt match {
+            case Some(languageColor) =>
+                <!-- Language color -->
+                <circle cx="23" cy={s"${lastDescriptionY + 21}"} r="7" stroke="none" fill={s"${languageColor}"}/>
+            case _ => ()
+          }
+        }
       </g>
     </svg>
   }
@@ -197,9 +215,10 @@ class Routing(gitHubApiService: domain.GitHubApiService,
                         )
                       ))
                   }
-                case _ =>
+                case a =>
+                  println(a)
                   // TODO: Fail response
-                  complete("Internal error in request")
+                  complete("Internal error in the request")
               }
             case _ =>
               // TODO: Fail response

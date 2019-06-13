@@ -8,7 +8,7 @@
     </span>
     <hr>
     <p>
-      <input type="text" v-model="repoName" placeholder="user/repo"><br>
+      <input type="text" v-model="repoName" placeholder="user/repo" class="repo_name"><br>
       <button @click="update()">Generate</button><br>
     </p>
     <div v-if="imageGenerated">
@@ -20,7 +20,14 @@
       <a :href="gitHubRepoUrl">
         <img :src="imageUrl">
       </a><br>
-      <textarea cols="60" rows="5">{{ imageTag }}</textarea>
+      <h3>Image URL</h3>
+      <input type="text" :value="imageUrl" size="60">
+      <h3>HTML</h3>
+      <textarea cols="60" rows="3">{{ embedHtml }}</textarea>
+      <h3>Markdown</h3>
+      <textarea cols="60" rows="3">{{ embedMarkdown }}</textarea>
+      <h3><a href="https://scrapbox.io" target="_blank">Scrapbox</a></h3>
+      <textarea cols="60" rows="3">{{ embedScrapbox }}</textarea>
     </div>
   </div>
 </template>
@@ -44,12 +51,16 @@ export default class GhCardGenerator extends Vue {
   private imageGenerated: boolean = false;
   private gitHubRepoUrl = '';
   private imageUrl = '';
-  private imageTag = '';
+  private embedHtml     = '';
+  private embedMarkdown = '';
+  private embedScrapbox = '';
 
   private update() {
     this.gitHubRepoUrl = this.getGitHubRepoUrl(this.repoName);
     this.imageUrl      = this.getImgUrl(this.repoName, this.imageExtension);
-    this.imageTag      = this.getImageTag(this.repoName, this.imageExtension);
+    this.embedHtml     = this.getEmbedHtml(this.repoName, this.imageExtension);
+    this.embedMarkdown = this.getEmbedMarkdown(this.repoName, this.imageExtension);
+    this.embedScrapbox = this.getEmbedScrapbox(this.repoName, this.imageExtension);
     // NOTE: This will be never false
     this.imageGenerated = true;
   }
@@ -62,8 +73,16 @@ export default class GhCardGenerator extends Vue {
     return `https://github.com/${repoName}`;
   }
 
-  private getImageTag(repoName: string, imageExtension: string): string {
+  private getEmbedHtml(repoName: string, imageExtension: string): string {
     return `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension)}"></a>`;
+  }
+
+  private getEmbedMarkdown(repoName: string, imageExtension: string): string {
+    return `[![${repoName} - GitHub](${this.getImgUrl(repoName, imageExtension)})](${this.getGitHubRepoUrl(repoName)})`;
+  }
+
+  private getEmbedScrapbox(repoName: string, imageExtension: string): string {
+    return `[${this.getImgUrl(repoName, imageExtension)} ${this.getGitHubRepoUrl(repoName)}]`;
   }
 
   @Watch('imageExtension')
@@ -79,7 +98,7 @@ export default class GhCardGenerator extends Vue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
-  margin: 40px 0 0;
+  margin: 1em 0 0;
 }
 ul {
   list-style-type: none;
@@ -92,7 +111,7 @@ li {
 a {
   color: #42b983;
 }
-input[type='text'] {
+.repo_name {
   font-size: 2em;
   width: 15em;
   text-align: center;

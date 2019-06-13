@@ -12,5 +12,5 @@
   }
   proxy / frontend:8000
   log / /var/log/access.log "{combined}"
-  tls /etc/letsencrypt/live/gh-card.dev/cert.pem /etc/letsencrypt/live/gh-card.dev/privkey.pem
+  tls /etc/tls/fullchain.pem /etc/tls/privkey.pem
 }

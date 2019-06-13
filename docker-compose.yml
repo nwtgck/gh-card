@@ -4,8 +4,8 @@ services:
     build: ./reverse-proxy
     volumes:
       - ./reverse-proxy/Caddyfile:/Caddyfile:ro
-      - /etc/letsencrypt/live/gh-card.dev/cert.pem:/etc/letsencrypt/live/gh-card.dev/cert.pem:ro
-      - /etc/letsencrypt/live/gh-card.dev/privkey.pem:/etc/letsencrypt/live/gh-card.dev/privkey.pem:ro
+      - /etc/letsencrypt/live/gh-card.dev/fullchain.pem:/etc/tls/fullchain.pem:ro
+      - /etc/letsencrypt/live/gh-card.dev/privkey.pem:/etc/tls/privkey.pem:ro
       - ./log/:/var/log/
     ports:
       - "80:80"

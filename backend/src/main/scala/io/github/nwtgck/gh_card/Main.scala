@@ -7,19 +7,29 @@ import redis.clients.jedis.Jedis
 import scopt.OptionParser
 
 object Main {
-  case class CmdOption(redisHost: String)
+  case class CmdOption(redisHost: String, gitHubClientId: Option[String], gitHubClientSecret: Option[String])
 
   // Option parser
   val optParser: OptionParser[CmdOption] = new scopt.OptionParser[CmdOption]("") {
     opt[String]("redis-host") action { (v, option) =>
       option.copy(redisHost = v)
     } text "Redis host"
+
+    opt[String]("github-client-id") action { (v, option) =>
+      option.copy(gitHubClientId = Some(v))
+    } text "GitHub Client ID"
+
+    opt[String]("github-client-secret") action { (v, option) =>
+      option.copy(gitHubClientSecret = Some(v))
+    } text "GitHub Client Secret"
   }
 
   def main(args: Array[String]): Unit = {
 
     optParser.parse(args, CmdOption(
-      redisHost = "localhost"
+      redisHost = "localhost",
+      gitHubClientId = None,
+      gitHubClientSecret = None
     )) match {
       case Some(option) =>
         implicit val system: ActorSystem = ActorSystem("gh-card")
@@ -27,6 +37,16 @@ object Main {
 
         // Create Redis client
         val jedis: Jedis = new Jedis(option.redisHost)
+
+        // Pair of GitHub Client ID and Secret
+        val gitHubAuthOpt: Option[GitHubApi.GitHubAuth] = for {
+          id     <- option.gitHubClientId
+          secret <- option.gitHubClientSecret
+        } yield GitHubApi.GitHubAuth(id, secret)
+
+        if (gitHubAuthOpt.isDefined) {
+          println("GitHub Client ID and Secret was set")
+        }
 
         // Create GitHub API Service
         val gitHubApiService: domain.GitHubApiService = new infra.DefaultGitHubApiService(
@@ -36,7 +56,8 @@ object Main {
             // 20 min
             // TODO: Hard code
             20 * 60
-          )
+          ),
+          gitHubAuthOpt
         )
 
         // PNG cache

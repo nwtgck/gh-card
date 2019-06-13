@@ -5,7 +5,8 @@ import io.github.nwtgck.gh_card.domain.{GitHubApiService, GitHubRepositoryJsonCa
 
 import scala.util.{Success, Try}
 
-class DefaultGitHubApiService(gitHubRepositoryJsonCacheRepository: GitHubRepositoryJsonCacheRepository) extends GitHubApiService {
+class DefaultGitHubApiService(gitHubRepositoryJsonCacheRepository: GitHubRepositoryJsonCacheRepository,
+                              gitHubAuthOpt: Option[GitHubApi.GitHubAuth]) extends GitHubApiService {
   /**
     * Get a repository
     *
@@ -27,9 +28,9 @@ class DefaultGitHubApiService(gitHubRepositoryJsonCacheRepository: GitHubReposit
           // Use cached JSON
           Success(json)
         case None       =>
-          println(s"Not cached used: ${repoName}")
+          println(s"Not cache used: ${repoName}")
           // Get repository by call GitHub API
-          GitHubApi.getRepository(repoName)
+          GitHubApi.getRepository(repoName, gitHubAuthOpt)
       }
       // Cache JSON
       _    <- Success(gitHubRepositoryJsonCacheRepository.cache(repoName, repoJson))

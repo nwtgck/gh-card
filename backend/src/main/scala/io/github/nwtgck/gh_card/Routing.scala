@@ -236,8 +236,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
                         )
                       ))
                   }
-                case a =>
-                  println(a)
+                case _ =>
                   // TODO: Fail response
                   complete("Internal error in the request")
               }

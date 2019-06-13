@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div>example:</div>
+    <h3>Example</h3>
     <span v-for="exampleRepoName in exampleRepoNames">
       <a :href="getGitHubRepoUrl(exampleRepoName)">
-      <img :src="getImgUrl(exampleRepoName, 'svg')">
+      <img :src="getImgUrl(exampleRepoName, 'svg', true)">
     </a>
     </span>
     <hr>
@@ -15,6 +15,9 @@
       <p>
         <input type="radio" v-model="imageExtension" value="svg">SVG
         <input type="radio" v-model="imageExtension" value="png">PNG
+      </p>
+      <p>
+        <input type="checkbox" v-model="useFullName"> Full name
       </p>
 
       <a :href="gitHubRepoUrl">
@@ -47,6 +50,7 @@ export default class GhCardGenerator extends Vue {
 
   private repoName = '';
   private imageExtension = 'svg';
+  private useFullName = false;
 
   private imageGenerated: boolean = false;
   private gitHubRepoUrl = '';
@@ -69,36 +73,45 @@ export default class GhCardGenerator extends Vue {
 
   private update() {
     this.gitHubRepoUrl = this.getGitHubRepoUrl(this.repoName);
-    this.imageUrl      = this.getImgUrl(this.repoName, this.imageExtension);
-    this.embedHtml     = this.getEmbedHtml(this.repoName, this.imageExtension);
-    this.embedMarkdown = this.getEmbedMarkdown(this.repoName, this.imageExtension);
-    this.embedScrapbox = this.getEmbedScrapbox(this.repoName, this.imageExtension);
+    this.imageUrl      = this.getImgUrl(this.repoName, this.imageExtension, this.useFullName);
+    this.embedHtml     = this.getEmbedHtml(this.repoName, this.imageExtension, this.useFullName);
+    this.embedMarkdown = this.getEmbedMarkdown(this.repoName, this.imageExtension, this.useFullName);
+    this.embedScrapbox = this.getEmbedScrapbox(this.repoName, this.imageExtension, this.useFullName);
     // NOTE: This will be never false
     this.imageGenerated = true;
   }
 
-  private getImgUrl(repoName: string, imageExtension: string): string {
-    return `${consts.imageServerUrl}/repos/${repoName}.${imageExtension}`;
+  private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean): string {
+    const query = useFullName ? '?fullname' : '';
+    return `${consts.imageServerUrl}/repos/${repoName}.${imageExtension}${query}`;
   }
 
   private getGitHubRepoUrl(repoName: string): string {
     return `https://github.com/${repoName}`;
   }
 
-  private getEmbedHtml(repoName: string, imageExtension: string): string {
-    return `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension)}"></a>`;
+  private getEmbedHtml(repoName: string, imageExtension: string, useFullName: boolean): string {
+    /* tslint:disable:max-line-length */
+    return `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension, useFullName)}"></a>`;
   }
 
-  private getEmbedMarkdown(repoName: string, imageExtension: string): string {
-    return `[![${repoName} - GitHub](${this.getImgUrl(repoName, imageExtension)})](${this.getGitHubRepoUrl(repoName)})`;
+  private getEmbedMarkdown(repoName: string, imageExtension: string, useFullName: boolean): string {
+    return `[![${repoName} - GitHub](${this.getImgUrl(repoName, imageExtension, useFullName)})](${this.getGitHubRepoUrl(repoName)})`;
   }
 
-  private getEmbedScrapbox(repoName: string, imageExtension: string): string {
-    return `[${this.getImgUrl(repoName, imageExtension)} ${this.getGitHubRepoUrl(repoName)}]`;
+  private getEmbedScrapbox(repoName: string, imageExtension: string, useFullName: boolean): string {
+    return `[${this.getImgUrl(repoName, imageExtension, useFullName)} ${this.getGitHubRepoUrl(repoName)}]`;
   }
 
   @Watch('imageExtension')
   private onImageExtension() {
+    if (this.imageGenerated) {
+      this.update();
+    }
+  }
+
+  @Watch('useFullName')
+  private onUseFullName() {
     if (this.imageGenerated) {
       this.update();
     }

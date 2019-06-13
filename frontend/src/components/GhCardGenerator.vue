@@ -11,9 +11,12 @@
       <input type="text" v-model="repoName" placeholder="user/repo"><br>
       <button @click="update()">Generate</button><br>
     </p>
-    <input type="radio" v-model="imageExtension" value="svg">SVG
-    <input type="radio" v-model="imageExtension" value="png">PNG
     <div v-if="imageGenerated">
+      <p>
+        <input type="radio" v-model="imageExtension" value="svg">SVG
+        <input type="radio" v-model="imageExtension" value="png">PNG
+      </p>
+
       <a :href="gitHubRepoUrl">
         <img :src="imageUrl">
       </a><br>

@@ -24,11 +24,11 @@ class DefaultGitHubApiService(gitHubRepositoryJsonCacheRepository: GitHubReposit
       repoJson <- jsonOpt match {
         // If cache is available
         case Some(json) =>
-          println(s"Cached used: ${repoName}")
+          println(s"Repo JSON cache used: ${repoName}")
           // Use cached JSON
           Success(json)
         case None       =>
-          println(s"Not cache used: ${repoName}")
+          println(s"Repo JSON cache NOT used: ${repoName}")
           // Get repository by call GitHub API
           GitHubApi.getRepository(repoName, gitHubAuthOpt)
       }

@@ -3,7 +3,7 @@ package io.github.nwtgck.gh_card
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import redis.clients.jedis.Jedis
+import com.redis.RedisClientPool
 import scopt.OptionParser
 
 object Main {
@@ -35,8 +35,9 @@ object Main {
         implicit val system: ActorSystem = ActorSystem("gh-card")
         implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-        // Create Redis client
-        val jedis: Jedis = new Jedis(option.redisHost)
+        // Redis client pool
+        // TODO: Hard code port
+        val redisClientPool: RedisClientPool = new RedisClientPool(option.redisHost, 6379)
 
         // Pair of GitHub Client ID and Secret
         val gitHubAuthOpt: Option[GitHubApi.GitHubAuth] = for {
@@ -51,7 +52,7 @@ object Main {
         // Create GitHub API Service
         val gitHubApiService: domain.GitHubApiService = new infra.DefaultGitHubApiService(
           gitHubRepositoryJsonCacheRepository = new infra.RedisGitHubRepositoryJsonCacheRepository(
-            jedis,
+            redisClientPool,
             // TTL for repo JSON
             // 20 min
             // TODO: Hard code
@@ -62,7 +63,7 @@ object Main {
 
         // PNG cache
         val gitHubRepositoryPngCardCacheRepository = new infra.RedisGitHubRepositoryPngCardCacheRepository(
-          jedis,
+          redisClientPool,
           // TTL for repo JSON
           // 20 min
           // TODO: Hard code

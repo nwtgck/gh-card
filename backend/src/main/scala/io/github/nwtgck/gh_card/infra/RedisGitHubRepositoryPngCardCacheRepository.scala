@@ -1,20 +1,26 @@
 package io.github.nwtgck.gh_card.infra
 
 import akka.util.ByteString
+import com.redis.RedisClientPool
 import io.github.nwtgck.gh_card.domain.GitHubRepositoryPngCardCacheRepository
-import redis.clients.jedis.Jedis
 
-class RedisGitHubRepositoryPngCardCacheRepository(jedis: Jedis, ttl: Int) extends GitHubRepositoryPngCardCacheRepository{
+class RedisGitHubRepositoryPngCardCacheRepository(redisClientPool: RedisClientPool, ttl: Int) extends GitHubRepositoryPngCardCacheRepository{
   val keyPrefix: String = "repo-png-card"
 
   override def cache(repoName: String, useFullName: Boolean, width: Int, height: Int, png: ByteString): Unit = {
     val key = s"${keyPrefix}/${repoName}/fullname=${useFullName}/${width}x${height}"
-    jedis.set(key.getBytes(), png.toArray)
-    jedis.expire(key, ttl)
+    redisClientPool.withClient{client =>
+      client.set(key, png.toArray)
+      client.expire(key, ttl)
+    }
   }
 
   override def get(repoName: String, useFullName: Boolean, width: Int, height: Int): Option[ByteString] = {
     val key = s"${keyPrefix}/${repoName}/fullname=${useFullName}/${width}x${height}"
-    Option(jedis.get(key.getBytes())).map(ByteString.fromArray)
+    redisClientPool.withClient{client =>
+      import com.redis.serialization._
+      import Parse.Implicits._
+      client.get[Array[Byte]](key).map(ByteString.fromArray)
+    }
   }
 }

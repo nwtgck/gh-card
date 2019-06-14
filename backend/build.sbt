@@ -41,7 +41,7 @@ lazy val root = (project in file(".")).
       // JSON parse
       "io.spray" %%  "spray-json" % "1.3.5",
       // Redis
-      "redis.clients" % "jedis" % "3.0.1",
+      "net.debasishg" %% "redisclient" % "3.10",
 
       // for SVG to PNG conversion
       // https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all

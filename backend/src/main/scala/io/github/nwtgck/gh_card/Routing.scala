@@ -81,6 +81,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
                       val pngByteString: ByteString = gitHubRepositoryPngCardCacheRepository
                         .get(s"${ownerName}/${shortRepoName}", useFullName, width, height)
                         .getOrElse({
+                          println(s"PNG cache not used: ${ownerName}/${shortRepoName}, fullname=${useFullName},width=${width},height=${height}")
                           // Convert SVG to png
                           val png = convertSvgToPng(svg, width, height)
                           // Cache PNG

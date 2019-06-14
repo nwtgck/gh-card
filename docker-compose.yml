@@ -1,3 +1,5 @@
+# NOTE: This is only for production environment currently
+
 version: '3.1'
 services:
   reverse_proxy:

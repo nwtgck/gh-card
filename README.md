@@ -1,4 +1,6 @@
 # gh-card
+[![CircleCI](https://circleci.com/gh/nwtgck/gh-card.svg?style=shield)](https://circleci.com/gh/nwtgck/gh-card)
+
 GitHub Repository Card for Every Web Site: <https://gh-card.dev>
 
 ## Example SVG card

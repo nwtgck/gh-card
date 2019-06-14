@@ -1,4 +1,4 @@
-0.0.0.0:80 {
+:80 {
   proxy /repos backend:8080 {
     header_upstream path {path}
   }
@@ -6,7 +6,7 @@
   log / /var/log/access.log "{combined}"
 }
 
-0.0.0.0:443 {
+:443 {
   proxy /repos backend:8080 {
     header_upstream path {path}
   }

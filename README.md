@@ -11,6 +11,7 @@ GitHub Repository Card for Every Web Site: <https://gh-card.dev>
 ![gh-card](doc_assets/gh-card.gif)
 
 ## How it works?
+The idea is similar to status badges from Travis CI, CircleCI and etc.
 
 An image URL is like "<https://gh-card.dev/repos/nwtgck/piping-server.svg>". The request triggers the backend server to call GitHub API request. The repository information are cached currently by Redis.
 

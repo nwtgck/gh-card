@@ -1,0 +1,66 @@
+# Scala CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/sample-config/ for more details
+#
+version: 2
+jobs:
+  backend_build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "backend/build.sbt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: 
+          command: cat /dev/null | sbt test:compile
+          working_directory: backend
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies--{{ checksum "backend/build.sbt" }}
+      - run:
+          name: test
+          command: cat /dev/null | sbt test:test
+          working_directory: backend
+      - run:
+          name: Check whether .jar file is created
+          command: |
+            sbt assembly
+            test -e target/jar/gh-card.jar
+          working_directory: backend
+
+  frontend_build:
+    docker:
+      - image: circleci/node:10
+    steps:
+     - checkout
+     - run:
+        command: npm install
+        working_directory: frontend
+     - run:
+        command: npm run lint
+        working_directory: frontend
+     # Check whether "run build" is successful
+     - run:
+        command: npm run build
+        working_directory: frontend
+
+workflows:
+  version: 2
+  frontend_and_backend:
+    jobs:
+      - backend_build
+      - frontend_build

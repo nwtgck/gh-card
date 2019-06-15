@@ -56,7 +56,10 @@ object GitHubRepositorySvgGenerator {
     // Get language color
     val languageColorOpt: Option[String] = languageOpt.map(GitHubLanguageColors.colors)
     // Convert description to lines
-    val descriptionLines: List[String] = descriptionToLines(description)
+    val descriptionLines: List[String] = descriptionToLines(
+      // Render emoji
+      emoji.EmojiRenderer.render(description)
+    )
 
     // Create description element and last y coordinate
     val (descriptionElems, lastDescriptionY): (List[scala.xml.Elem], Int) = {

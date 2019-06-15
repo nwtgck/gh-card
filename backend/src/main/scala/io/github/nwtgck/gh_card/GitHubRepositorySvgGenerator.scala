@@ -37,7 +37,22 @@ object GitHubRepositorySvgGenerator {
     }
   }
 
-  def generateSvg(shortRepoName: String, languageOpt: Option[String], description: String, nStars: Int, nForks: Int): Elem = {
+  private def getGitHubRepositoryUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}"
+  }
+
+  private def getGitHubStargazersUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}/stargazers"
+  }
+
+  private def getGitHubNetworkMemberUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}/network/members"
+  }
+
+  def generateSvg(ownerName: String, shortRepoName: String, useFullName: Boolean, languageOpt: Option[String], description: String, nStars: Int, nForks: Int): Elem = {
+    // Name on image
+    val repoNameInImage: String = if (useFullName) s"${ownerName}/${shortRepoName}" else shortRepoName
+
     // Get language color
     val languageColorOpt: Option[String] = languageOpt.map(GitHubLanguageColors.colors)
     // Convert description to lines
@@ -69,9 +84,9 @@ object GitHubRepositorySvgGenerator {
     }
 
     // Star icon
-    val starIcon: Elem = (<path vector-effect="none" fill-rule="evenodd" d="M14,6 L9.1,5.36 L7,1 L4.9,5.36 L0,6 L3.6,9.26 L2.67,14 L7,11.67 L11.33,14 L10.4,9.26 L14,6" />)
+    val starIcon: Elem = (<a href={s"${getGitHubStargazersUrl(ownerName, shortRepoName)}"}><path vector-effect="none" fill-rule="evenodd" d="M14,6 L9.1,5.36 L7,1 L4.9,5.36 L0,6 L3.6,9.26 L2.67,14 L7,11.67 L11.33,14 L10.4,9.26 L14,6" /></a>)
     // Fork icon
-    val forkIcon: Elem = (<path vector-effect="none" fill-rule="evenodd" d="M10,5 C10,3.89 9.11,3 8,3 C7.0966,2.99761 6.30459,3.60318 6.07006,4.47561 C5.83554,5.34804 6.21717,6.2691 7,6.72 L7,7.02 C6.98,7.54 6.77,8 6.37,8.4 C5.97,8.8 5.51,9.01 4.99,9.03 C4.16,9.05 3.51,9.19 2.99,9.48 L2.99,4.72 C3.77283,4.2691 4.15446,3.34804 3.91994,2.47561 C3.68541,1.60318 2.8934,0.997613 1.99,1 C0.88,1 0,1.89 0,3 C0.00428689,3.71022 0.384911,4.3649 1,4.72 L1,11.28 C0.41,11.63 0,12.27 0,13 C0,14.11 0.89,15 2,15 C3.11,15 4,14.11 4,13 C4,12.47 3.8,12 3.47,11.64 C3.56,11.58 3.95,11.23 4.06,11.17 C4.31,11.06 4.62,11 5,11 C6.05,10.95 6.95,10.55 7.75,9.75 C8.55,8.95 8.95,7.77 9,6.73 L8.98,6.73 C9.59,6.37 10,5.73 10,5 M2,1.8 C2.66,1.8 3.2,2.35 3.2,3 C3.2,3.65 2.65,4.2 2,4.2 C1.35,4.2 0.8,3.65 0.8,3 C0.8,2.35 1.35,1.8 2,1.8 M2,14.21 C1.34,14.21 0.8,13.66 0.8,13.01 C0.8,12.36 1.35,11.81 2,11.81 C2.65,11.81 3.2,12.36 3.2,13.01 C3.2,13.66 2.65,14.21 2,14.21 M8,6.21 C7.34,6.21 6.8,5.66 6.8,5.01 C6.8,4.36 7.35,3.81 8,3.81 C8.65,3.81 9.2,4.36 9.2,5.01 C9.2,5.66 8.65,6.21 8,6.21 " />)
+    val forkIcon: Elem = (<a href={s"${getGitHubNetworkMemberUrl(ownerName, shortRepoName)}"}><path vector-effect="none" fill-rule="evenodd" d="M10,5 C10,3.89 9.11,3 8,3 C7.0966,2.99761 6.30459,3.60318 6.07006,4.47561 C5.83554,5.34804 6.21717,6.2691 7,6.72 L7,7.02 C6.98,7.54 6.77,8 6.37,8.4 C5.97,8.8 5.51,9.01 4.99,9.03 C4.16,9.05 3.51,9.19 2.99,9.48 L2.99,4.72 C3.77283,4.2691 4.15446,3.34804 3.91994,2.47561 C3.68541,1.60318 2.8934,0.997613 1.99,1 C0.88,1 0,1.89 0,3 C0.00428689,3.71022 0.384911,4.3649 1,4.72 L1,11.28 C0.41,11.63 0,12.27 0,13 C0,14.11 0.89,15 2,15 C3.11,15 4,14.11 4,13 C4,12.47 3.8,12 3.47,11.64 C3.56,11.58 3.95,11.23 4.06,11.17 C4.31,11.06 4.62,11 5,11 C6.05,10.95 6.95,10.55 7.75,9.75 C8.55,8.95 8.95,7.77 9,6.73 L8.98,6.73 C9.59,6.37 10,5.73 10,5 M2,1.8 C2.66,1.8 3.2,2.35 3.2,3 C3.2,3.65 2.65,4.2 2,4.2 C1.35,4.2 0.8,3.65 0.8,3 C0.8,2.35 1.35,1.8 2,1.8 M2,14.21 C1.34,14.21 0.8,13.66 0.8,13.01 C0.8,12.36 1.35,11.81 2,11.81 C2.65,11.81 3.2,12.36 3.2,13.01 C3.2,13.66 2.65,14.21 2,14.21 M8,6.21 C7.34,6.21 6.8,5.66 6.8,5.01 C6.8,4.36 7.35,3.81 8,3.81 C8.65,3.81 9.2,4.36 9.2,5.01 C9.2,5.66 8.65,6.21 8,6.21 " /></a>)
 
     // TODO: Support forked-repo icon
     // TODO: Simplify conditional-branch for star and forks
@@ -91,7 +106,9 @@ object GitHubRepositorySvgGenerator {
         </g>
         <g fill="#0366d6" fill-opacity="1" stroke="#0366d6" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- Repo name -->
-          <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{shortRepoName}</text>
+          <a href={s"${getGitHubRepositoryUrl(ownerName, shortRepoName)}"}>
+            <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{repoNameInImage}</text>
+          </a>
         </g>
         <!-- Description -->
         {descriptionElems}
@@ -115,13 +132,28 @@ object GitHubRepositorySvgGenerator {
         }</g>
         <g fill="#586069" fill-opacity="1" stroke="#586069" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- The number of stars or fork -->
-          <text fill="#586069" fill-opacity="1" stroke="none" xml:space="preserve" x={s"${languageNextX + 21}"} y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{
-            if (nStars > 0) {
-              gitHubNumberString(nStars)
-            } else if (nForks > 0){
-              gitHubNumberString(nForks)
+          {
+            // Url & Number of stars or forks
+            val urlAndNumberStr: Option[(String, String)] =
+              if (nStars > 0) {
+                Some((getGitHubStargazersUrl(ownerName, shortRepoName), gitHubNumberString(nStars)))
+              } else if (nForks > 0){
+                Some((getGitHubNetworkMemberUrl(ownerName, shortRepoName), gitHubNumberString(nForks)))
+              } else {
+                None
+              }
+
+            urlAndNumberStr match {
+              case Some((url, numberStr)) =>
+                <a href={url}>
+                  <text fill="#586069" fill-opacity="1" stroke="none" xml:space="preserve" x={s"${languageNextX + 21}"} y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{
+                    numberStr
+                  }</text>
+                </a>
+              case _ =>
+                ()
             }
-          }</text>
+          }
         </g>
 
         <!-- Fork icon or none -->
@@ -132,11 +164,13 @@ object GitHubRepositorySvgGenerator {
         }</g>
         <g fill="#586069" fill-opacity="1" stroke="#586069" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- The number of forks or none -->
-          <text fill="" fill-opacity="1" stroke="none" xml:space="preserve" x={s"${languageNextX + 80}"} y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{
+          {
             if (nStars > 0 && nForks > 0) {
-              gitHubNumberString(nForks)
+              <a href={s"${getGitHubNetworkMemberUrl(ownerName, shortRepoName)}"}>
+                <text fill="" fill-opacity="1" stroke="none" xml:space="preserve" x={s"${languageNextX + 80}"} y={s"${lastDescriptionY + 26}"} font-family="sans-serif" font-size="12" font-weight="400" font-style="normal">{gitHubNumberString(nForks)}</text>
+              </a>
             }
-          }</text>
+          }
         </g>
         {
         languageColorOpt match {

@@ -51,12 +51,11 @@ class Routing(gitHubApiService: domain.GitHubApiService,
               println(s"ownerName: ${ownerName}, repoName: ${shortRepoName}")
               gitHubApiService.getRepository(s"${ownerName}/${shortRepoName}") match {
                 case Success(repo) =>
-                  // Repo name in an card
-                  val repoNameInImage: String = if (useFullName) s"${ownerName}/${shortRepoName}" else shortRepoName
-
                   // Generate SVG image
                   val svg = GitHubRepositorySvgGenerator.generateSvg(
-                    repoNameInImage,
+                    ownerName,
+                    shortRepoName,
+                    useFullName,
                     repo.language,
                     repo.description.getOrElse(""),
                     repo.stargazers_count,

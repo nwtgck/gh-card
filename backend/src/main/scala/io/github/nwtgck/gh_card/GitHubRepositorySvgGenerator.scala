@@ -37,7 +37,22 @@ object GitHubRepositorySvgGenerator {
     }
   }
 
-  def generateSvg(shortRepoName: String, languageOpt: Option[String], description: String, nStars: Int, nForks: Int): Elem = {
+  private def gitHubRepositoryUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}"
+  }
+
+  private def gitHubStargazersUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}/stargazers"
+  }
+
+  private def gitHubNetworkMemberUrl(ownerName: String, shortRepoName: String): String = {
+    s"https://github.com/${ownerName}/${shortRepoName}/network/members"
+  }
+
+  def generateSvg(ownerName: String, shortRepoName: String, useFullName: Boolean, languageOpt: Option[String], description: String, nStars: Int, nForks: Int): Elem = {
+    // Name on image
+    val repoNameInImage: String = if (useFullName) s"${ownerName}/${shortRepoName}" else shortRepoName
+
     // Get language color
     val languageColorOpt: Option[String] = languageOpt.map(GitHubLanguageColors.colors)
     // Convert description to lines
@@ -91,7 +106,9 @@ object GitHubRepositorySvgGenerator {
         </g>
         <g fill="#0366d6" fill-opacity="1" stroke="#0366d6" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
           <!-- Repo name -->
-          <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{shortRepoName}</text>
+          <a href={s"${gitHubRepositoryUrl(ownerName, shortRepoName)}"}>
+            <text fill="#0366d6" fill-opacity="1" stroke="none" xml:space="preserve" x="41" y="33" font-family="sans-serif" font-size="16" font-weight="630" font-style="normal">{repoNameInImage}</text>
+          </a>
         </g>
         <!-- Description -->
         {descriptionElems}

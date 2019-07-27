@@ -73,7 +73,16 @@ export default class GhCardGenerator extends Vue {
 
   private get cleanRepoName(): string {
     // Remove white spaces from repo name
-    return this.repoName.replace(/\s/g, '');
+    const noSpaces =  this.repoName.replace(/\s/g, '');
+    try {
+      // Extract path part
+      // e.g. "https://github.com/nwtgck/piping-server" => "nwtgck/piping-server"
+      // e.g. "https://github.com/nwtgck/piping-server/blob/develop/LICENSE" => "nwtgck/piping-server"
+      const [user, name, ..._] = new URL(noSpaces).pathname.substring(1).split('/');
+      return `${user}/${name}`;
+    } catch {
+      return noSpaces;
+    }
   }
 
   private update() {

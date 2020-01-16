@@ -3,7 +3,7 @@
     <h3>Example</h3>
     <span v-for="exampleRepoName in exampleRepoNames">
       <a :href="getGitHubRepoUrl(exampleRepoName)">
-      <img :src="getImgUrl(exampleRepoName, 'svg', true)">
+      <img :src="getImgUrl(exampleRepoName, 'svg', true, '')">
     </a>
     </span>
     <hr>
@@ -20,12 +20,31 @@
         <input type="checkbox" v-model="useFullName"> Full name
       </p>
 
-      <a :href="gitHubRepoUrl">
-        <img :src="imageUrl">
-      </a><br>
+      <div v-if="linkTarget === ''">
+        <a :href="gitHubRepoUrl">
+          <img :src="imageUrl">
+        </a>
+      </div>
+      <div v-else>
+        <object type="image/svg+xml" :data="imageUrl">
+          <!-- Here is fallback -->
+          <a :href="gitHubRepoUrl">
+            <img :src="imageUrl">
+          </a>
+        </object>
+      </div>
       <h3>Image URL</h3>
       <input type="text" :value="imageUrl" size="60">
       <h3>HTML</h3>
+      <p>
+        Link target:
+        <select v-model="linkTarget" :disabled="imageExtension === 'png'">
+          <option value="">none</option>
+          <option value="_top">_top</option>
+          <option value="_parent">_parent</option>
+          <option value="_blank">_blank</option>
+        </select>
+      </p>
       <textarea cols="60" rows="3">{{ embedHtml }}</textarea>
       <h3>Markdown</h3>
       <textarea cols="60" rows="3">{{ embedMarkdown }}</textarea>
@@ -51,6 +70,7 @@ export default class GhCardGenerator extends Vue {
   private repoName = '';
   private imageExtension = 'svg';
   private useFullName = false;
+  private linkTarget = '';
 
   private imageGenerated: boolean = false;
   private gitHubRepoUrl = '';
@@ -87,16 +107,21 @@ export default class GhCardGenerator extends Vue {
 
   private update() {
     this.gitHubRepoUrl = this.getGitHubRepoUrl(this.cleanRepoName);
-    this.imageUrl      = this.getImgUrl(this.cleanRepoName, this.imageExtension, this.useFullName);
-    this.embedHtml     = this.getEmbedHtml(this.cleanRepoName, this.imageExtension, this.useFullName);
+    this.imageUrl      = this.getImgUrl(this.cleanRepoName, this.imageExtension, this.useFullName, this.linkTarget);
+    this.embedHtml     = this.getEmbedHtml(this.cleanRepoName, this.imageExtension, this.useFullName, this.linkTarget);
     this.embedMarkdown = this.getEmbedMarkdown(this.cleanRepoName, this.imageExtension, this.useFullName);
     this.embedScrapbox = this.getEmbedScrapbox(this.cleanRepoName, this.imageExtension, this.useFullName);
     // NOTE: This will be never false
     this.imageGenerated = true;
   }
 
-  private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean): string {
-    const query = useFullName ? '?fullname' : '';
+  private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: string): string {
+    const queryParams = Array.prototype.concat(
+      useFullName ? 'fullname' : [],
+      linkTarget ? `linkTarget=${linkTarget}` : [],
+    );
+    let query = queryParams.join('&');
+    query = query && `?${query}`;
     return `${consts.imageServerUrl}/repos/${repoName}.${imageExtension}${query}`;
   }
 
@@ -104,28 +129,37 @@ export default class GhCardGenerator extends Vue {
     return `https://github.com/${repoName}`;
   }
 
-  private getEmbedHtml(repoName: string, imageExtension: string, useFullName: boolean): string {
-    /* tslint:disable:max-line-length */
-    return `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension, useFullName)}"></a>`;
+  private getEmbedHtml(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: string): string {
+    return linkTarget ?
+      `<object type="image/svg+xml" data="${this.getImgUrl(repoName, imageExtension, useFullName, linkTarget)}"></object>` :
+      `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension, useFullName, linkTarget)}"></a>`;
   }
 
   private getEmbedMarkdown(repoName: string, imageExtension: string, useFullName: boolean): string {
-    return `[![${repoName} - GitHub](${this.getImgUrl(repoName, imageExtension, useFullName)})](${this.getGitHubRepoUrl(repoName)})`;
+    return `[![${repoName} - GitHub](${this.getImgUrl(repoName, imageExtension, useFullName, '')})](${this.getGitHubRepoUrl(repoName)})`;
   }
 
   private getEmbedScrapbox(repoName: string, imageExtension: string, useFullName: boolean): string {
-    return `[${this.getImgUrl(repoName, imageExtension, useFullName)} ${this.getGitHubRepoUrl(repoName)}]`;
+    return `[${this.getImgUrl(repoName, imageExtension, useFullName, '')} ${this.getGitHubRepoUrl(repoName)}]`;
   }
 
   @Watch('imageExtension')
   private onImageExtension() {
     if (this.imageGenerated) {
+      this.linkTarget = this.imageExtension === 'png' ? '' : this.linkTarget;
       this.update();
     }
   }
 
   @Watch('useFullName')
   private onUseFullName() {
+    if (this.imageGenerated) {
+      this.update();
+    }
+  }
+
+  @Watch('linkTarget')
+  private onLinkTarget() {
     if (this.imageGenerated) {
       this.update();
     }

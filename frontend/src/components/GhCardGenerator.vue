@@ -26,12 +26,7 @@
         </a>
       </div>
       <div v-else>
-        <object type="image/svg+xml" :data="imageUrl">
-          <!-- Here is fallback -->
-          <a :href="gitHubRepoUrl">
-            <img :src="imageUrl">
-          </a>
-        </object>
+        <object type="image/svg+xml" :data="imageUrl"></object>
       </div>
       <h3>Image URL</h3>
       <input type="text" :value="imageUrl" size="60">

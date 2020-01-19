@@ -40,11 +40,11 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         complete("e.g. /repos/rust-lang/rust.svg")
       } ~
       path("repos" / Remaining) { repoNameWithExt =>
-        parameter("fullname".?) { fullname: Option[String] =>
+        parameters('fullname.?, 'linkTarget.?) { (fullname: Option[String], linkTarget: Option[String]) =>
           // Whether include owner or not
           val useFullName: Boolean = fullname.isDefined
 
-          println(s"repoNameWithExt: ${repoNameWithExt}, useFullName: ${useFullName}")
+          println(s"repoNameWithExt: ${repoNameWithExt}, useFullName: ${useFullName}, linkTarget: ${linkTarget}")
           val reg = """(.+)/(.+)\.(svg|png)""".r
           repoNameWithExt match {
             case reg(ownerName, shortRepoName, extension) =>
@@ -56,6 +56,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
                     ownerName,
                     shortRepoName,
                     useFullName,
+                    linkTarget.getOrElse(""),
                     repo.language,
                     repo.description.getOrElse(""),
                     repo.stargazers_count,

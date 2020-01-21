@@ -113,14 +113,14 @@ export default class GhCardGenerator extends Vue {
   }
 
   private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: LinkTarget): string {
-    // TODO: better
-    const queryParams = Array.prototype.concat(
-      useFullName ? 'fullname' : [],
-      linkTarget ? `link_target=${linkTarget}` : [],
-    );
-    let query = queryParams.join('&');
-    query = query && `?${query}`;
-    return `${consts.imageServerUrl}/repos/${repoName}.${imageExtension}${query}`;
+    const url = new URL(`${consts.imageServerUrl}/repos/${repoName}.${imageExtension}`);
+    if (useFullName) {
+      url.searchParams.set('fullname', '');
+    }
+    if (linkTarget) {
+      url.searchParams.set('link_target', linkTarget);
+    }
+    return url.href;
   }
 
   private getGitHubRepoUrl(repoName: string): string {

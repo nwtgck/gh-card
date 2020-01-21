@@ -40,7 +40,7 @@ class Routing(gitHubApiService: domain.GitHubApiService,
         complete("e.g. /repos/rust-lang/rust.svg")
       } ~
       path("repos" / Remaining) { repoNameWithExt =>
-        parameters('fullname.?, 'linkTarget.?) { (fullname: Option[String], linkTarget: Option[String]) =>
+        parameters('fullname.?, 'link_target.?) { (fullname: Option[String], linkTarget: Option[String]) =>
           // Whether include owner or not
           val useFullName: Boolean = fullname.isDefined
 

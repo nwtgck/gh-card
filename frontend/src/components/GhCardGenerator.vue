@@ -116,7 +116,7 @@ export default class GhCardGenerator extends Vue {
     // TODO: better
     const queryParams = Array.prototype.concat(
       useFullName ? 'fullname' : [],
-      linkTarget ? `linkTarget=${linkTarget}` : [],
+      linkTarget ? `link_target=${linkTarget}` : [],
     );
     let query = queryParams.join('&');
     query = query && `?${query}`;

@@ -56,6 +56,8 @@ import consts from '@/constants';
 
 console.log(`image server is ${consts.imageServerUrl}`);
 
+type LinkTarget = '' | '_top' | '_parent' | '_blank';
+
 @Component
 export default class GhCardGenerator extends Vue {
   private exampleRepoNames = [
@@ -65,7 +67,7 @@ export default class GhCardGenerator extends Vue {
   private repoName = '';
   private imageExtension = 'svg';
   private useFullName = false;
-  private linkTarget = '';
+  private linkTarget: LinkTarget = '';
 
   private imageGenerated: boolean = false;
   private gitHubRepoUrl = '';
@@ -110,7 +112,8 @@ export default class GhCardGenerator extends Vue {
     this.imageGenerated = true;
   }
 
-  private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: string): string {
+  private getImgUrl(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: LinkTarget): string {
+    // TODO: better
     const queryParams = Array.prototype.concat(
       useFullName ? 'fullname' : [],
       linkTarget ? `linkTarget=${linkTarget}` : [],
@@ -124,7 +127,7 @@ export default class GhCardGenerator extends Vue {
     return `https://github.com/${repoName}`;
   }
 
-  private getEmbedHtml(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: string): string {
+  private getEmbedHtml(repoName: string, imageExtension: string, useFullName: boolean, linkTarget: LinkTarget): string {
     return linkTarget ?
       `<object type="image/svg+xml" data="${this.getImgUrl(repoName, imageExtension, useFullName, linkTarget)}"></object>` :
       `<a href="${this.getGitHubRepoUrl(repoName)}"><img src="${this.getImgUrl(repoName, imageExtension, useFullName, linkTarget)}"></a>`;

@@ -64,7 +64,7 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
     }
     const githubRepoJson = repoResult.repo;
 
-    const svg = generateSvg({
+    const {width, height, svg} = generateSvg({
       ownerName,
       shortRepoName,
       usesFullName,
@@ -84,12 +84,11 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
         res.send(svgStr);
         return;
       case "png":
-        // TODO: Hard code
-        const width  = 450;
-        const height = 160;
         // TODO: High resolution
-        // TODO: Scale properly
-        const pngBuffer: Buffer = await svg2png(Buffer.from(svgStr), {width, height});
+        const pngBuffer: Buffer = await svg2png(
+          Buffer.from(svgStr),
+          {width, height}
+        );
         // TODO: cache pngBuffer
         res.header({
           'Content-Type': 'image/png',

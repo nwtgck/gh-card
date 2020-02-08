@@ -4,6 +4,7 @@ import * as redis from "redis";
 
 import {RedisGitHubRepositoryJsonCacheRepository} from './infra/RedisGitHubRepositoryJsonCacheRepository';
 import {DefaultGitHubApiService} from "./infra/DefaultGitHubApiService";
+import {RedisGitHubRepositoryPngCardCacheRepository} from "./infra/RedisGitHubRepositoryPngCardCacheRepository";
 import {createServer} from "./route";
 
 // Create option parser
@@ -49,7 +50,13 @@ const gitHubRepositoryJsonCacheRepository = new RedisGitHubRepositoryJsonCacheRe
   redisClient,
   // 20 min
   // TODO: Hard code
-  20 * 60
+  20 * 60,
+);
+const gitHubRepositoryPngCardCacheRepository = new RedisGitHubRepositoryPngCardCacheRepository(
+  redisClient,
+  // 20 min
+  // TODO: Hard code
+  20 * 60,
 );
 const gitHubApiService = new DefaultGitHubApiService(
   logger,
@@ -58,7 +65,8 @@ const gitHubApiService = new DefaultGitHubApiService(
 );
 const server = createServer({
   logger,
-  gitHubApiService
+  gitHubApiService,
+  gitHubRepositoryPngCardCacheRepository,
 });
 
 // TODO: hard code

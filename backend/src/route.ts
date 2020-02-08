@@ -6,6 +6,7 @@ import {renderToString} from 'react-dom/server';
 import * as svg2png from 'svg2png';
 
 import {GitHubApiService} from './domain/GitHubApiService';
+import {GitHubRepositoryPngCardCacheRepository} from './domain/GitHubRepositoryPngCardCacheRepository';
 import {generateSvg} from './svg-generator';
 
 
@@ -21,7 +22,9 @@ const repoRequestQueryType = t.type({
   link_target: t.union([t.string, t.undefined]),
 });
 
-export function createServer({logger, gitHubApiService}: {logger: log4js.Logger, gitHubApiService: GitHubApiService}) {
+export function createServer(
+  {logger, gitHubApiService, gitHubRepositoryPngCardCacheRepository}:
+  {logger: log4js.Logger, gitHubApiService: GitHubApiService, gitHubRepositoryPngCardCacheRepository: GitHubRepositoryPngCardCacheRepository}) {
   const app = express();
 
   app.get('/', (req, res) => {
@@ -50,12 +53,13 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
     const usesFullName: boolean = repoRequestQuery.fullname !== undefined;
     const linkTarget: string = repoRequestQuery.link_target ?? "";
 
-    const repoResult = await gitHubApiService.getRepository(`${ownerName}/${shortRepoName}`);
+    const repoName = `${ownerName}/${shortRepoName}`;
+    const repoResult = await gitHubApiService.getRepository(`${repoName}`);
 
     if ("status" in repoResult) {
       if (repoResult.status === 404) {
         res.status(404);
-        res.send(`${ownerName}/${shortRepoName} not found\n`);
+        res.send(`${repoName} not found\n`);
         return;
       }
       res.status(400);
@@ -84,12 +88,28 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
         res.send(svgStr);
         return;
       case "png":
-        // TODO: High resolution
-        const pngBuffer: Buffer = await svg2png(
-          Buffer.from(svgStr),
-          {width, height}
+        let pngBuffer: Buffer | undefined = await gitHubRepositoryPngCardCacheRepository.get(
+          repoName,
+          usesFullName,
+          width,
+          height,
         );
-        // TODO: cache pngBuffer
+        if (pngBuffer === undefined) {
+          // TODO: High resolution
+          pngBuffer = await svg2png(
+            Buffer.from(svgStr),
+            {width, height}
+          );
+          // Cache PNG
+          gitHubRepositoryPngCardCacheRepository.cache(
+            pngBuffer,
+            repoName,
+            usesFullName,
+            width,
+            height,
+          );
+        }
+
         res.header({
           'Content-Type': 'image/png',
         });

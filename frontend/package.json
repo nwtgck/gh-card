@@ -17,7 +17,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-pwa": "^3.11.0",
-    "@vue/cli-plugin-typescript": "^3.11.0",
+    "@vue/cli-plugin-typescript": "^4.2.2",
     "@vue/cli-service": "^3.11.0",
     "typescript": "^3.7.5",
     "vue-template-compiler": "^2.6.11"

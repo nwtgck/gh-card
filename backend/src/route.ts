@@ -15,6 +15,11 @@ const repoWithExtType = t.type({
 });
 type RepoWithExt = t.TypeOf<typeof repoWithExtType>;
 
+const repoRequestQueryType = t.type({
+  fullname: t.union([t.string, t.undefined]),
+  link_target: t.union([t.string, t.undefined]),
+});
+
 // TODO: Extract as something
 const githubRepoJsonType = t.type({
   description: t.union([t.string, t.undefined]),
@@ -42,6 +47,17 @@ export function createServer(logger: log4js.Logger) {
     logger.info(`valid request: ${JSON.stringify(repoWithExt)}`);
     const {ownerName, shortRepoName, extension} = repoWithExt;
 
+    // Validate query
+    const repoRequestQueryEither = repoRequestQueryType.decode(req.query);
+    if (isLeft(repoRequestQueryEither)) {
+      res.status(400);
+      res.send('invalid query parameter');
+      return;
+    }
+    const repoRequestQuery = repoRequestQueryEither.right;
+    const usesFullName: boolean = repoRequestQuery.fullname !== undefined;
+    const linkTarget: string = repoRequestQuery.link_target ?? "";
+
     // TODO: Extract as something
     // TODO: Use GitHub Client ID and secret
     const githubRes = await fetch(`https://api.github.com/repos/${ownerName}/${shortRepoName}`);
@@ -60,10 +76,8 @@ export function createServer(logger: log4js.Logger) {
     const svg = generateSvg({
       ownerName,
       shortRepoName,
-      // TODO: Hard code
-      usesFullName: true,
-      // TODO: Hard code
-      linkTarget: '',
+      usesFullName,
+      linkTarget,
       language: githubRepoJson.language,
       description: githubRepoJson.description ?? "",
       nStars: githubRepoJson.stargazers_count,

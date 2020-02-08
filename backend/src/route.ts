@@ -3,6 +3,10 @@ import { isLeft } from 'fp-ts/lib/Either'
 import * as express from 'express';
 import * as log4js from "log4js";
 import fetch from "node-fetch";
+import {renderToString} from 'react-dom/server';
+
+import {generateSvg} from './svg-generator';
+
 
 const repoWithExtType = t.type({
   ownerName: t.string,
@@ -26,7 +30,7 @@ export function createServer(logger: log4js.Logger) {
   app.get('/', (req, res) => {
     res.send("e.g. /repos/rust-lang/rust.svg");
   });
-  
+
   app.get('/repos/:ownerName/:shortRepoName.:extension', async (req, res) => {
     const repoWithExtEither = repoWithExtType.decode(req.params);
     if (isLeft(repoWithExtEither)) {
@@ -41,6 +45,7 @@ export function createServer(logger: log4js.Logger) {
     // TODO: Extract as something
     // TODO: Use GitHub Client ID and secret
     const githubRes = await fetch(`https://api.github.com/repos/${ownerName}/${shortRepoName}`);
+    // TODO: handle repository not found
     const githubRepoJsonEither = githubRepoJsonType.decode(await githubRes.json());
     if (isLeft(githubRepoJsonEither)) {
       res.status(500);
@@ -49,11 +54,27 @@ export function createServer(logger: log4js.Logger) {
       return;
     }
     const githubRepoJson = githubRepoJsonEither.right;
-    // TODO: remove
-    console.log(githubRepoJson);
 
-    // TODO: implement
-    res.send(req.params);
+    // TODO: handle .png
+    const svg = generateSvg({
+      ownerName,
+      shortRepoName,
+      // TODO: Hard code
+      useFullName: true,
+      // TODO: Hard code
+      linkTarget: '',
+      language: githubRepoJson.language,
+      description: githubRepoJson.description ?? "",
+      nStars: githubRepoJson.stargazers_count,
+      nForks: githubRepoJson.forks_count,
+    });
+
+    const svgString: string = renderToString(svg);
+
+    res.header({
+      'Content-Type': 'image/svg+xml',
+    });
+    res.send(svgString);
   });
 
   return app;

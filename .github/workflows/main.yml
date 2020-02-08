@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 12.x
       - run: cd frontend && npm ci
-      - run: cd frontend && npm run build
+      - run: cd frontend && GH_CARD_IMAGE_SERVER_URL=https://gh-card.dev npm run build
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.0

@@ -61,11 +61,20 @@ export function createServer(logger: log4js.Logger) {
     // TODO: Extract as something
     // TODO: Use GitHub Client ID and secret
     const githubRes = await fetch(`https://api.github.com/repos/${ownerName}/${shortRepoName}`);
-    // TODO: handle repository not found
+    if (githubRes.status !== 200) {
+      if (githubRes.status === 404) {
+        res.status(404);
+        res.send(`${ownerName}/${shortRepoName} not found\n`);
+        return;
+      }
+      res.status(400);
+      res.send("Error in GitHub API\n");
+      return;
+    }
     const githubRepoJsonEither = githubRepoJsonType.decode(await githubRes.json());
     if (isLeft(githubRepoJsonEither)) {
       res.status(500);
-      res.send("Error in GitHub API");
+      res.send("Decode Error in GitHub API");
       logger.error(`Invalid JSON from GitHub API: ${JSON.stringify(repoWithExt)}`);
       return;
     }

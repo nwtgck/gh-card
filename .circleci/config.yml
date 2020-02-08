@@ -1,0 +1,61 @@
+# Scala CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/sample-config/ for more details
+#
+version: 2
+jobs:
+  backend_build:
+    docker:
+      - image: circleci/node:12
+    steps:
+     - checkout
+     - run:
+        command: npm ci
+        working_directory: backend
+     # Check whether "run build" is successful
+     - run:
+        command: npm run build
+        working_directory: backend
+
+  frontend_build:
+    docker:
+      - image: circleci/node:10
+    steps:
+     - checkout
+     - run:
+        command: npm install
+        working_directory: frontend
+     - run:
+        command: npm run lint
+        working_directory: frontend
+     # Check whether "run build" is successful
+     - run:
+        command: npm run build
+        working_directory: frontend
+  
+  docker_compose_build:
+    machine:
+      # (base: https://circleci.com/docs/2.0/configuration-reference/#machine)
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+         command: docker-compose build
+
+  docker_compose_local_build:
+    machine:
+      # (base: https://circleci.com/docs/2.0/configuration-reference/#machine)
+      image: ubuntu-1604:201903-01
+    steps:
+     - checkout
+     - run:
+        command: docker-compose -f docker-compose.local.yml build
+
+workflows:
+  version: 2
+  frontend_and_backend:
+    jobs:
+      - backend_build
+      - frontend_build
+      - docker_compose_build
+      - docker_compose_local_build

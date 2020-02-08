@@ -1,0 +1,37 @@
+# NOTE: This is only for production environment currently
+
+version: '3.1'
+services:
+  reverse_proxy:
+    build: ./reverse-proxy
+    volumes:
+      - ./reverse-proxy/Caddyfile:/Caddyfile:ro
+      - /etc/letsencrypt/live/gh-card.dev/fullchain.pem:/etc/tls/fullchain.pem:ro
+      - /etc/letsencrypt/live/gh-card.dev/privkey.pem:/etc/tls/privkey.pem:ro
+      - ./log/:/var/log/
+    ports:
+      - "80:80"
+      - "443:443"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    expose:
+      - "8000"
+
+  backend:
+    build: ./backend
+    restart: always
+    command: --redis-host=cache --github-client-id=$GITHUB_CLIENT_ID --github-client-secret=$GITHUB_CLIENT_SECRET
+    depends_on:
+      - cache
+    expose:
+      - "8080"
+
+  cache:
+    image: redis
+    restart: always
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"

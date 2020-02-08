@@ -1,0 +1,37 @@
+# Usage:
+#  docker-compose -f docker-compose.local.yml up
+#
+# Access to http://localhost:9080
+
+version: '3.1'
+services:
+  reverse_proxy:
+    build: ./reverse-proxy
+    volumes:
+      - ./reverse-proxy/local.caddyfile:/Caddyfile:ro
+      - ./log/:/var/log/
+    ports:
+      - "9080:80"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    expose:
+      - "8000"
+
+  backend:
+    build: ./backend
+    restart: always
+    command: --redis-host=cache
+    depends_on:
+      - cache
+    expose:
+      - "8080"
+
+  cache:
+    image: redis
+    restart: always
+    expose:
+      - "6379"
+    ports:
+      - "9379:6379"

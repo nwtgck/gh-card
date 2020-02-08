@@ -1,0 +1,22 @@
+:80 {
+  proxy /repos backend:8080 {
+    header_upstream path {path}
+    try_duration 10s
+  }
+  proxy / frontend:8000 {
+    try_duration 6s
+  }
+  log / /var/log/access.log "{combined}"
+}
+
+:443 {
+  proxy /repos backend:8080 {
+    header_upstream path {path}
+    try_duration 10s
+  }
+  proxy / frontend:8000 {
+    try_duration 6s
+  }
+  log / /var/log/access.log "{combined}"
+  tls /etc/tls/fullchain.pem /etc/tls/privkey.pem
+}

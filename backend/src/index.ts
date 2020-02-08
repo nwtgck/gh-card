@@ -1,6 +1,7 @@
 import * as yargs from "yargs";
 import * as log4js from "log4js";
 
+import {DefaultGitHubApiService} from "./infra/DefaultGitHubApiService";
 import {createServer} from "./route";
 
 // Create option parser
@@ -36,7 +37,11 @@ if (githubSecret === undefined) {
   logger.info("GitHub secret is not set");
 }
 
-const server = createServer(logger);
+const gitHubApiService = new DefaultGitHubApiService();
+const server = createServer({
+  logger,
+  gitHubApiService
+});
 
 // TODO: hard code
 const httpPort = 8080

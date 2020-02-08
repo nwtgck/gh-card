@@ -1,24 +1,17 @@
-# NOTE: Multi-stage Build
+FROM node:12.14
 
-FROM nwtgck/pre-installed-sbt:1.2.8 as build
+LABEL maintainer="Ryo Ota <nwtgck@nwtgck.org>"
 
-# Copy all things in this repo except files in .dockerignore
 COPY . /app
+
 # Move to /app
 WORKDIR /app
-# Generate jar
-RUN sbt assembly
 
+# Install requirements, build and remove devDependencies
+# (from: https://stackoverflow.com/a/25571391/2885946)
+RUN npm ci && \
+    npm run build && \
+    npm prune --production
 
-## Open JDK 8
-FROM openjdk:8
-LABEL maintainer="Ryo Ota <nwtgck@gmail.com>"
-
-# Make directories
-RUN mkdir -p /app/backend
-
-# Copy artifact
-COPY --from=build /app/target/jar/gh-card.jar /app/backend/gh-card.jar
-
-# Run entry (Run the server)
-ENTRYPOINT ["java", "-jar", "/app/backend/gh-card.jar"]
+# Run a server
+ENTRYPOINT [ "node", "dist/src/index.js" ]

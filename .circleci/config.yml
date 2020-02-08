@@ -6,41 +6,16 @@ version: 2
 jobs:
   backend_build:
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-
-    working_directory: ~/repo
-
-    environment:
-      # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
-
+      - image: circleci/node:12
     steps:
-      - checkout
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "backend/build.sbt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-      - run: 
-          command: cat /dev/null | sbt test:compile
-          working_directory: backend
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies--{{ checksum "backend/build.sbt" }}
-      - run:
-          name: test
-          command: cat /dev/null | sbt test:test
-          working_directory: backend
-      - run:
-          name: Check whether .jar file is created
-          command: |
-            sbt assembly
-            test -e target/jar/gh-card.jar
-          working_directory: backend
+     - checkout
+     - run:
+        command: npm ci
+        working_directory: backend
+     # Check whether "run build" is successful
+     - run:
+        command: npm run build
+        working_directory: backend
 
   frontend_build:
     docker:
@@ -57,6 +32,24 @@ jobs:
      - run:
         command: npm run build
         working_directory: frontend
+  
+  docker_compose_build:
+    machine:
+      # (base: https://circleci.com/docs/2.0/configuration-reference/#machine)
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+         command: docker-compose build
+
+  docker_compose_local_build:
+    machine:
+      # (base: https://circleci.com/docs/2.0/configuration-reference/#machine)
+      image: ubuntu-1604:201903-01
+    steps:
+     - checkout
+     - run:
+        command: docker-compose -f docker-compose.local.yml build
 
 workflows:
   version: 2
@@ -64,3 +57,5 @@ workflows:
     jobs:
       - backend_build
       - frontend_build
+      - docker_compose_build
+      - docker_compose_local_build

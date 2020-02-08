@@ -29,14 +29,16 @@ logger.level = "info";
 const args = parser.parse(process.argv);
 const redisHost: string = args["redis-host"];
 const githubClientId: string | undefined = args["github-client-id"];
-const githubSecret: string | undefined = args["github-client-secret"];
+const githubClientSecret: string | undefined = args["github-client-secret"];
+let githubCredential: {githubClientId: string, githubClientSecret: string} | undefined;
 
-if (githubClientId === undefined) {
-  logger.info("GitHub client ID is not set");
-}
-
-if (githubSecret === undefined) {
-  logger.info("GitHub secret is not set");
+if (githubClientId === undefined || githubClientSecret === undefined) {
+  logger.info("GitHub client ID or secret is not set");
+} else {
+  githubCredential = {
+    githubClientId,
+    githubClientSecret,
+  };
 }
 
 const redisClient = redis.createClient({
@@ -49,7 +51,11 @@ const gitHubRepositoryJsonCacheRepository = new RedisGitHubRepositoryJsonCacheRe
   // TODO: Hard code
   20 * 60
 );
-const gitHubApiService = new DefaultGitHubApiService(logger, gitHubRepositoryJsonCacheRepository);
+const gitHubApiService = new DefaultGitHubApiService(
+  logger,
+  githubCredential,
+  gitHubRepositoryJsonCacheRepository,
+);
 const server = createServer({
   logger,
   gitHubApiService

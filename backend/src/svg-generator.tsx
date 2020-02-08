@@ -56,11 +56,11 @@ function getGitHubNetworkMemberUrl(ownerName: string, shortRepoName: string): st
 }
 
 export function generateSvg(
-    {ownerName, shortRepoName, useFullName, linkTarget, language, description, nStars, nForks}:
-    {ownerName: string, shortRepoName: string, useFullName: boolean, linkTarget: string, language: string | undefined, description: string, nStars: number, nForks: number}
+    {ownerName, shortRepoName, usesFullName: usesFullName, linkTarget, language, description, nStars, nForks}:
+    {ownerName: string, shortRepoName: string, usesFullName: boolean, linkTarget: string, language: string | undefined, description: string, nStars: number, nForks: number}
   ): JSX.Element {
   // Name on image
-  const repoNameInImage: string = useFullName ? `${ownerName}/${shortRepoName}` : shortRepoName
+  const repoNameInImage: string = usesFullName ? `${ownerName}/${shortRepoName}` : shortRepoName
   // Get language color
   const colors: {[lang: string]: string} = ghLanguageColors;
   const languageColor: string | undefined = (language === undefined) ? undefined : colors[language];

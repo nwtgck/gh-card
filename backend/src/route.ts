@@ -53,6 +53,7 @@ export function createServer(logger: log4js.Logger) {
       logger.error(`Invalid JSON from GitHub API: ${JSON.stringify(repoWithExt)}`);
       return;
     }
+    // TODO: cache
     const githubRepoJson = githubRepoJsonEither.right;
 
     // TODO: handle .png
@@ -60,7 +61,7 @@ export function createServer(logger: log4js.Logger) {
       ownerName,
       shortRepoName,
       // TODO: Hard code
-      useFullName: true,
+      usesFullName: true,
       // TODO: Hard code
       linkTarget: '',
       language: githubRepoJson.language,

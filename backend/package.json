@@ -1,0 +1,28 @@
+{
+  "name": "gh-card-backend",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "mocha --require ts-node/register test/**/*.ts"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nwtgck/gh-card"
+  },
+  "author": "Ryo Ota",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/power-assert": "^1.5.3",
+    "mocha": "^6.2.2",
+    "power-assert": "^1.6.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {}
+}

@@ -1,6 +1,8 @@
 import * as yargs from "yargs";
 import * as log4js from "log4js";
+import * as redis from "redis";
 
+import {RedisGitHubRepositoryJsonCacheRepository} from './infra/RedisGitHubRepositoryJsonCacheRepository';
 import {DefaultGitHubApiService} from "./infra/DefaultGitHubApiService";
 import {createServer} from "./route";
 
@@ -37,7 +39,17 @@ if (githubSecret === undefined) {
   logger.info("GitHub secret is not set");
 }
 
-const gitHubApiService = new DefaultGitHubApiService();
+const redisClient = redis.createClient({
+  host: redisHost,
+});
+
+const gitHubRepositoryJsonCacheRepository = new RedisGitHubRepositoryJsonCacheRepository(
+  redisClient,
+  // 20 min
+  // TODO: Hard code
+  20 * 60
+);
+const gitHubApiService = new DefaultGitHubApiService(logger, gitHubRepositoryJsonCacheRepository);
 const server = createServer({
   logger,
   gitHubApiService

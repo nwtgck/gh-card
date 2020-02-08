@@ -3,6 +3,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import * as express from 'express';
 import * as log4js from "log4js";
 import {renderToString} from 'react-dom/server';
+import * as svg2png from 'svg2png';
 
 import {GitHubApiService} from './domain/GitHubApiService';
 import {generateSvg} from './svg-generator';
@@ -11,7 +12,7 @@ import {generateSvg} from './svg-generator';
 const repoWithExtType = t.type({
   ownerName: t.string,
   shortRepoName: t.string,
-  extension: t.string
+  extension: t.union([t.literal("svg"), t.literal("png")]),
 });
 type RepoWithExt = t.TypeOf<typeof repoWithExtType>;
 
@@ -61,10 +62,8 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
       res.send("Error in GitHub API\n");
       return;
     }
-    // TODO: cache
     const githubRepoJson = repoResult.repo;
 
-    // TODO: handle .png
     const svg = generateSvg({
       ownerName,
       shortRepoName,
@@ -75,13 +74,29 @@ export function createServer({logger, gitHubApiService}: {logger: log4js.Logger,
       nStars: githubRepoJson.stargazers_count,
       nForks: githubRepoJson.forks_count,
     });
+    const svgStr: string = renderToString(svg);
 
-    const svgString: string = renderToString(svg);
-
-    res.header({
-      'Content-Type': 'image/svg+xml',
-    });
-    res.send(svgString);
+    switch (extension) {
+      case "svg":
+        res.header({
+          'Content-Type': 'image/svg+xml',
+        });
+        res.send(svgStr);
+        return;
+      case "png":
+        // TODO: Hard code
+        const width  = 450;
+        const height = 160;
+        // TODO: High resolution
+        // TODO: Scale properly
+        const pngBuffer: Buffer = await svg2png(Buffer.from(svgStr), {width, height});
+        // TODO: cache pngBuffer
+        res.header({
+          'Content-Type': 'image/png',
+        });
+        res.send(pngBuffer);
+        return;
+    }
   });
 
   return app;

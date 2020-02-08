@@ -25,6 +25,7 @@
     "@types/power-assert": "^1.5.3",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
+    "@types/svg2png": "^4.1.0",
     "@types/yargs": "^15.0.3",
     "mocha": "^6.2.2",
     "power-assert": "^1.6.1",
@@ -42,6 +43,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "redis": "^2.8.0",
+    "svg2png": "^4.1.1",
     "yargs": "^15.1.0"
   }
 }

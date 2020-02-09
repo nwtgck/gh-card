@@ -8,5 +8,6 @@ export const githubRepoJsonType = t.type({
   language: t.union([t.string, t.undefined]),
   stargazers_count: t.number,
   forks_count: t.number,
+  fork: t.boolean,
 });
 export type GithubRepoJson = t.TypeOf<typeof githubRepoJsonType>;

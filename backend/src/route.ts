@@ -77,6 +77,7 @@ export function createServer(
       description: githubRepoJson.description ?? "",
       nStars: githubRepoJson.stargazers_count,
       nForks: githubRepoJson.forks_count,
+      isFork: githubRepoJson.fork,
     });
     const svgStr: string = renderToString(svg);
 

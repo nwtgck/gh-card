@@ -56,8 +56,8 @@ function getGitHubNetworkMemberUrl(ownerName: string, shortRepoName: string): st
 }
 
 export function generateSvg(
-    {ownerName, shortRepoName, usesFullName: usesFullName, linkTarget, language, description, nStars, nForks}:
-    {ownerName: string, shortRepoName: string, usesFullName: boolean, linkTarget: string, language: string | undefined, description: string, nStars: number, nForks: number}
+    {ownerName, shortRepoName, usesFullName: usesFullName, linkTarget, language, description, nStars, nForks, isFork}:
+    {ownerName: string, shortRepoName: string, usesFullName: boolean, linkTarget: string, language: string | undefined, description: string, nStars: number, nForks: number, isFork: boolean}
   ): {width: number, height: number, svg: JSX.Element} {
   // Name on image
   const repoNameInImage: string = usesFullName ? `${ownerName}/${shortRepoName}` : shortRepoName
@@ -107,8 +107,13 @@ export function generateSvg(
           {/* Boarder */}
           <rect x="0" y="0" width="441" height={height} stroke="#eaecef" stroke-width="2" />
           <g fill="#586069" fill-opacity="1" stroke="none" transform="matrix(1.25,0,0,1.25,17,21)">
-            {/* Repo icon like book */}
-            <path vector-effect="none" fill-rule="evenodd" d="M4,9 L3,9 L3,8 L4,8 L4,9 M4,6 L3,6 L3,7 L4,7 L4,6 M4,4 L3,4 L3,5 L4,5 L4,4 M4,2 L3,2 L3,3 L4,3 L4,2 M12,1 L12,13 C12,13.55 11.55,14 11,14 L6,14 L6,16 L4.5,14.5 L3,16 L3,14 L1,14 C0.45,14 0,13.55 0,13 L0,1 C0,0.45 0.45,0 1,0 L11,0 C11.55,0 12,0.45 12,1 M11,11 L1,11 L1,13 L3,13 L3,12 L6,12 L6,13 L11,13 L11,11 M11,1 L2,1 L2,10 L11,10 L11,1" />
+            {
+              (isFork) 
+                // Fork icon
+                ? <path fill-rule="evenodd" d="M8 1a1.993 1.993 0 00-1 3.72V6L5 8 3 6V4.72A1.993 1.993 0 002 1a1.993 1.993 0 00-1 3.72V6.5l3 3v1.78A1.993 1.993 0 005 15a1.993 1.993 0 001-3.72V9.5l3-3V4.72A1.993 1.993 0 008 1zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3 10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3-10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path>
+                // Repo icon like book
+                : <path vector-effect="none" fill-rule="evenodd" d="M4,9 L3,9 L3,8 L4,8 L4,9 M4,6 L3,6 L3,7 L4,7 L4,6 M4,4 L3,4 L3,5 L4,5 L4,4 M4,2 L3,2 L3,3 L4,3 L4,2 M12,1 L12,13 C12,13.55 11.55,14 11,14 L6,14 L6,16 L4.5,14.5 L3,16 L3,14 L1,14 C0.45,14 0,13.55 0,13 L0,1 C0,0.45 0.45,0 1,0 L11,0 C11.55,0 12,0.45 12,1 M11,11 L1,11 L1,13 L3,13 L3,12 L6,12 L6,13 L11,13 L11,11 M11,1 L2,1 L2,10 L11,10 L11,1" />
+            }
           </g>
           <g fill="#0366d6" fill-opacity="1" stroke="#0366d6" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,0,0)">
             {/* Repo name */}

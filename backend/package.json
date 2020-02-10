@@ -19,7 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.2",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.1",
     "@types/node": "^13.7.0",
     "@types/node-fetch": "^2.5.4",
     "@types/power-assert": "^1.5.3",

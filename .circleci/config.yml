@@ -59,10 +59,18 @@ jobs:
         command: curl http://localhost:9080/
      - run:
         name: SVG card
-        command: curl http://localhost:9080/repos/nwtgck/piping-server.svg
+        command: |
+          set -xeu
+          time curl http://localhost:9080/repos/nwtgck/piping-server.svg
+          # Cache should be enabled
+          time curl http://localhost:9080/repos/nwtgck/piping-server.svg
      - run:
         name: PNG card
-        command: curl -sS http://localhost:9080/repos/nwtgck/piping-server.png | file -
+        command: |
+          set -xeu
+          time curl -sS http://localhost:9080/repos/nwtgck/piping-server.png | file -
+          # Cache should be enabled
+          time curl -sS http://localhost:9080/repos/nwtgck/piping-server.png | file -
      - run:
         name: Server log
         command: docker-compose -f docker-compose.local.yml logs

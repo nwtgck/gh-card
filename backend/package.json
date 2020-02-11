@@ -33,7 +33,7 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
-    "@types/redis": "^2.8.14",
+    "@types/redis": "^2.8.15",
     "express": "^4.17.1",
     "fp-ts": "^2.4.4",
     "gh-language-colors": "^0.1.0",

@@ -19,7 +19,7 @@
     "@vue/cli-plugin-pwa": "~4.2.2",
     "@vue/cli-plugin-typescript": "~4.2.2",
     "@vue/cli-service": "~4.2.2",
-    "typescript": "~3.7.5",
+    "typescript": "~3.8.2",
     "vue-template-compiler": "^2.6.11"
   }
 }

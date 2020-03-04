@@ -26,7 +26,7 @@
     "@types/react": "^16.9.22",
     "@types/react-dom": "^16.9.5",
     "@types/svg2png": "^4.1.0",
-    "@types/yargs": "^15.0.3",
+    "@types/yargs": "^15.0.4",
     "mocha": "^7.0.1",
     "power-assert": "^1.6.1",
     "ts-node": "^8.6.2",

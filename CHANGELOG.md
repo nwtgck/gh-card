@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.2.1] - 2020-03-05
+### Changed
+* Update dependencies
+
+## Fixed
+* Fix GitHub API request
+
 ## [0.2.0] - 2020-02-09
 ### Changed
 * Update dependencies
@@ -14,5 +21,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Added
 * Initial release
 
-[Unreleased]: https://github.com/nwtgck/gh-card/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/nwtgck/gh-card/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/nwtgck/gh-card/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/nwtgck/gh-card/compare/v0.1.0...v0.2.0

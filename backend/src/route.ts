@@ -57,6 +57,7 @@ export function createServer(
     const repoResult = await gitHubApiService.getRepository(`${repoName}`);
 
     if ("status" in repoResult) {
+      logger.error(`GitHub API error: ${JSON.stringify(repoResult)}`);
       if (repoResult.status === 404) {
         res.status(404);
         res.send(`${repoName} not found\n`);

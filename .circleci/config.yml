@@ -42,14 +42,38 @@ jobs:
       - run:
          command: docker-compose build
 
-  docker_compose_local_build:
+  docker_compose_local_working_test:
     machine:
       # (base: https://circleci.com/docs/2.0/configuration-reference/#machine)
       image: ubuntu-1604:201903-01
     steps:
      - checkout
      - run:
+        name: Build
         command: docker-compose -f docker-compose.local.yml build
+     - run:
+        name: Up
+        command: docker-compose -f docker-compose.local.yml up -d
+     - run:
+        name: Web frontend GET
+        command: curl http://localhost:9080/
+     - run:
+        name: SVG card
+        command: |
+          set -xeu
+          time curl http://localhost:9080/repos/nwtgck/piping-server.svg
+          # Cache should be enabled
+          time curl http://localhost:9080/repos/nwtgck/piping-server.svg
+     - run:
+        name: PNG card
+        command: |
+          set -xeu
+          time curl -sS http://localhost:9080/repos/nwtgck/piping-server.png | file -
+          # Cache should be enabled
+          time curl -sS http://localhost:9080/repos/nwtgck/piping-server.png | file -
+     - run:
+        name: Server log
+        command: docker-compose -f docker-compose.local.yml logs
 
 workflows:
   version: 2
@@ -58,4 +82,4 @@ workflows:
       - backend_build
       - frontend_build
       - docker_compose_build
-      - docker_compose_local_build
+      - docker_compose_local_working_test

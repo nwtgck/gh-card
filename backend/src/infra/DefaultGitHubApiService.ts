@@ -17,6 +17,7 @@ export class DefaultGitHubApiService implements GitHubApiService {
     if (jsonStr === undefined) {
       this.logger.info(`Repository JSON ${repoName} is not cached`);
 
+      let query = '';
       const headers= (() => {
         if (this.githubCredential === undefined) {
           return {};
@@ -26,11 +27,12 @@ export class DefaultGitHubApiService implements GitHubApiService {
             // Basic Auth
             "Authorization": `Basic: ${Buffer.from(`${githubClientId}:${githubClientSecret}`).toString("base64")}`,
           };
+          query = `?client_id=${githubClientId}&client_secret=${githubClientSecret}`;
           return h;
         }
       })();
 
-      const githubRes = await fetch(`https://api.github.com/repos/${repoName}`, {
+      const githubRes = await fetch(`https://api.github.com/repos/${repoName}${query}`, {
         headers,
       });
       if (githubRes.status !== 200) {

@@ -74,7 +74,7 @@ export function createServer(
       shortRepoName,
       usesFullName,
       linkTarget,
-      language: githubRepoJson.language,
+      language: githubRepoJson.language ?? undefined,
       description: githubRepoJson.description ?? "",
       nStars: githubRepoJson.stargazers_count,
       nForks: githubRepoJson.forks_count,

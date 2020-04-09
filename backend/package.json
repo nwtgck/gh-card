@@ -18,7 +18,7 @@
   "author": "Ryo Ota",
   "license": "MIT",
   "devDependencies": {
-    "@types/express": "^4.17.5",
+    "@types/express": "^4.17.6",
     "@types/mocha": "^7.0.2",
     "@types/node": "^12.12.35",
     "@types/node-fetch": "^2.5.5",

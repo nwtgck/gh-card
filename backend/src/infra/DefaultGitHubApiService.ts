@@ -41,11 +41,11 @@ export class DefaultGitHubApiService implements GitHubApiService {
           resText: await githubRes.text(),
         };
       }
-      jsonStr = await githubRes.text(); 
+      jsonStr = await githubRes.text();
       // Cache
       this.gitHubRepositoryJsonCacheRepository.cache(repoName, jsonStr);
     }
-    
+
     const githubRepoJsonEither = githubRepoJsonType.decode(JSON.parse(jsonStr));
     if (isLeft(githubRepoJsonEither)) {
       throw githubRepoJsonEither.left;

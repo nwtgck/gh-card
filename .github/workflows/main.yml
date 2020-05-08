@@ -3,19 +3,20 @@ name: main
 on:
   push:
   pull_request:
-    types: [opened, synchronize]
 
 jobs:
   build:
     runs-on: ubuntu-18.04
-
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: 12.x
-      - run: cd frontend && npm ci
-      - run: cd frontend && GH_CARD_IMAGE_SERVER_URL=https://gh-card.dev npm run build
+      - run: npm ci
+      - run: GH_CARD_IMAGE_SERVER_URL=https://gh-card.dev npm run build
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.0

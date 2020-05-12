@@ -30,7 +30,7 @@
     "mocha": "^7.1.1",
     "power-assert": "^1.6.1",
     "ts-node": "^8.8.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   },
   "dependencies": {
     "@types/redis": "^2.8.17",

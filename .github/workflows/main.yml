@@ -17,7 +17,7 @@ jobs:
       - run: GH_CARD_IMAGE_SERVER_URL=https://gh-card.dev npm run build
 
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v1.0
+        uses: nwtgck/actions-netlify@v1.1
         with:
           publish-dir: './frontend/dist'
           production-branch: master

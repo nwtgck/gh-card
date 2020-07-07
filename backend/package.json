@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "fp-ts": "^2.6.2",
+    "fp-ts": "^2.7.0",
     "gh-language-colors": "^0.1.0",
     "io-ts": "^2.2.4",
     "log4js": "^6.3.0",

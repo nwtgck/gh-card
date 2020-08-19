@@ -37,7 +37,7 @@
     "express": "^4.17.1",
     "fp-ts": "^2.6.2",
     "gh-language-colors": "^0.1.0",
-    "io-ts": "^2.2.4",
+    "io-ts": "^2.2.10",
     "log4js": "^6.3.0",
     "node-fetch": "^2.6.0",
     "react": "^16.13.1",

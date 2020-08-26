@@ -28,7 +28,7 @@
     "@types/redis": "^2.8.22",
     "@types/svg2png": "^4.1.0",
     "@types/yargs": "^15.0.5",
-    "mocha": "^7.2.0",
+    "mocha": "^8.1.2",
     "power-assert": "^1.6.1",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.3"

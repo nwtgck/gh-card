@@ -39,7 +39,7 @@
     "gh-language-colors": "^0.1.0",
     "io-ts": "^2.2.4",
     "log4js": "^6.3.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "redis": "^3.0.2",

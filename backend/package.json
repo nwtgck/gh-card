@@ -24,7 +24,7 @@
     "@types/node-fetch": "^2.5.7",
     "@types/power-assert": "^1.5.3",
     "@types/react": "^16.9.35",
-    "@types/react-dom": "^16.9.8",
+    "@types/react-dom": "^17.0.9",
     "@types/redis": "^2.8.22",
     "@types/svg2png": "^4.1.0",
     "@types/yargs": "^15.0.5",
